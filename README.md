@@ -58,6 +58,21 @@ For regression, predictions include a `std` column: the spread of the individual
 
 Good public sources of natural-product data: [COCONUT](https://coconut.naturalproducts.net), [NPASS](https://bidd.group/NPASS/), [ChEMBL](https://www.ebi.ac.uk/chembl/) (bioactivity), [LOTUS](https://lotus.naturalproducts.net).
 
+## Web tool: NP Explorer
+
+`docs/index.html` is a self-contained interactive guide to natural products. Open it in a browser (an internet connection is needed to load RDKit.js).
+
+- **Sources**: plants, microbes, fungi, marine organisms, animals, genome mining
+- **Biosynthesis map** (diagram): shikimate, acetate–malonate, mevalonate/MEP and amino-acid pathways, and which compound classes each one produces
+- **Structural classes**: alkaloids, flavonoids, terpenoids, phenylpropanoids, polyketides and non-ribosomal peptides, with structures drawn live
+- **Drug-discovery pipeline** (interactive diagram): 12 steps from source selection to clinical approval. Click a step for its methods.
+- **Landmark drugs** from nature
+- **ML pipeline** (diagram) of this repository's `np_model`
+- **Molecule lab**: paste a SMILES string to get the structure, properties (MW, cLogP, TPSA, Fsp³…), Lipinski/Veber checks, a predicted class and the nearest compounds from the demo dataset
+- **Dataset explorer**: all 69 demo compounds, searchable and filterable by class
+
+To publish it online, go to the repository's **Settings → Pages**, choose **Deploy from a branch**, then **main** / **/docs**.
+
 ## Tests
 
 ```bash

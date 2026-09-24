@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Natural Products Explorer</title>
+<meta name="description" content="An end-to-end guide to natural products: sources, biosynthesis, compound classes, drug discovery, and machine learning, with an in-browser molecule lab.">
+<style>
+:root {
+  --bg: #f7f6f2; --surface: #ffffff; --surface-2: #efede6; --border: #dcd8cc;
+  --text: #1d2320; --muted: #5d655f; --accent: #2f7d4f; --accent-soft: #e2f0e6;
+  --link: #1f6a42; --warn: #9a5b00; --ok: #2f7d4f; --bad: #b3261e;
+  --c-alkaloid: #2c6fbb; --c-flavonoid: #c98a00; --c-terpenoid: #2f8f5b;
+  --c-phenylpropanoid: #8250b8; --c-polyketide: #c2453d; --c-peptide: #1c8a8a;
+  --node: #ffffff; --node-stroke: #b9b4a5; --edge: #8a8577;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.05);
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614; --surface: #1a201d; --surface-2: #222a26; --border: #323b36;
+    --text: #e6ebe7; --muted: #9ba59f; --accent: #5fbf86; --accent-soft: #1f3328;
+    --link: #7fd3a1; --warn: #e0a84a; --ok: #5fbf86; --bad: #ef7a72;
+    --c-alkaloid: #6aa6e8; --c-flavonoid: #e3b33f; --c-terpenoid: #5fbf86;
+    --c-phenylpropanoid: #b08ae0; --c-polyketide: #ec7f76; --c-peptide: #4fc4c4;
+    --node: #1f2723; --node-stroke: #45514a; --edge: #7d877f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121614; --surface: #1a201d; --surface-2: #222a26; --border: #323b36;
+  --text: #e6ebe7; --muted: #9ba59f; --accent: #5fbf86; --accent-soft: #1f3328;
+  --link: #7fd3a1; --warn: #e0a84a; --ok: #5fbf86; --bad: #ef7a72;
+  --c-alkaloid: #6aa6e8; --c-flavonoid: #e3b33f; --c-terpenoid: #5fbf86;
+  --c-phenylpropanoid: #b08ae0; --c-polyketide: #ec7f76; --c-peptide: #4fc4c4;
+  --node: #1f2723; --node-stroke: #45514a; --edge: #7d877f;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+a { color: var(--link); }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .9em; }
+h1, h2, h3 { line-height: 1.25; margin: 0 0 .5em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.1rem; }
+p { margin: 0 0 1em; }
+
+/* Nav */
+header.top {
+  position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+}
+.top-inner { max-width: 1120px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 16px; align-items: center; }
+.brand { font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+.brand svg { width: 22px; height: 22px; }
+nav.links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+nav.links::-webkit-scrollbar { display: none; }
+nav.links a { color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 8px; font-size: .9rem; white-space: nowrap; }
+nav.links a:hover, nav.links a.active { background: var(--surface-2); color: var(--text); }
+.theme-btn { background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: .9rem; }
+
+main { max-width: 1120px; margin: 0 auto; padding: 0 16px 64px; }
+section { padding: 48px 0 8px; }
+.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 760px; }
+
+.hero { padding: 56px 0 24px; }
+.hero h1 { font-size: clamp(2rem, 5vw, 3rem); max-width: 820px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.stat b { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+.stat span { color: var(--muted); font-size: .92rem; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin: 20px 0; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 680px; height: auto; }
+.diagram figcaption { color: var(--muted); font-size: .88rem; padding: 8px 6px 2px; }
+svg .node rect { fill: var(--node); stroke: var(--node-stroke); stroke-width: 1.2; }
+svg .node.clickable { cursor: pointer; }
+svg .node.clickable:hover rect, svg .node.sel rect { stroke: var(--accent); stroke-width: 2.2; }
+svg .node text { fill: var(--text); font: 600 13px system-ui, sans-serif; }
+svg .node text.sub { fill: var(--muted); font-weight: 400; font-size: 11px; }
+svg .edge { fill: none; stroke: var(--edge); stroke-width: 1.5; }
+svg .edge.loop { stroke-dasharray: 5 4; }
+svg .edge-label { fill: var(--muted); font: italic 11px system-ui, sans-serif; }
+svg .band { font: 700 11px system-ui, sans-serif; letter-spacing: .08em; fill: var(--muted); }
+svg .arrowhead { fill: var(--edge); }
+
+.src-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.src { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.src .ico { font-size: 1.6rem; }
+.src b { display: block; margin: 4px 0; }
+.src span { font-size: .9rem; color: var(--muted); }
+
+.class-card { border-top: 4px solid var(--cc, var(--accent)); display: flex; flex-direction: column; }
+.class-card .struct { background: #fff; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center; margin: 8px 0 12px; border: 1px solid var(--border); }
+.class-card .struct svg { max-width: 100%; max-height: 100%; }
+.class-card .struct .ph { color: #777; font-size: .85rem; }
+.class-card dl { margin: 0; font-size: .92rem; }
+.class-card dt { font-weight: 700; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; margin-top: 8px; }
+.class-card dd { margin: 2px 0 0; }
+.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .78rem; font-weight: 600; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.pill.cls { color: #fff; border: none; }
+
+.step-detail { margin-top: 4px; }
+.step-detail h3 { display: flex; align-items: center; gap: 10px; }
+.step-detail .num { background: var(--accent); color: #fff; border-radius: 999px; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; flex: none; }
+.step-detail ul { margin: 0; padding-left: 1.2em; }
+.hint { color: var(--muted); font-size: .88rem; }
+
+table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.table-wrap table { min-width: 620px; }
+
+/* Molecule lab */
+.lab { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 820px) { .lab { grid-template-columns: 1fr; } }
+.input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.input-row input { flex: 1 1 240px; min-width: 0; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9rem; }
+button.primary { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+button.chip { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: .85rem; cursor: pointer; }
+button.chip:hover, button.chip.on { border-color: var(--accent); color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.mol-view { background: #fff; border-radius: 10px; border: 1px solid var(--border); min-height: 280px; display: flex; align-items: center; justify-content: center; margin-top: 12px; }
+.mol-view svg { max-width: 100%; height: auto; }
+.mol-view .ph { color: #777; padding: 24px; text-align: center; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.kv div { background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
+.kv small { display: block; color: var(--muted); font-size: .75rem; }
+.kv b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.pred { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 12px; }
+.pred .big { font-size: 1.35rem; font-weight: 700; }
+.bars { display: grid; gap: 6px; }
+.bar { display: grid; grid-template-columns: 120px 1fr 44px; gap: 8px; align-items: center; font-size: .88rem; }
+.bar .track { background: var(--surface-2); border-radius: 999px; height: 10px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 999px; }
+.bar .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.nn { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.nn li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; background: var(--surface-2); border-radius: 8px; font-size: .9rem; cursor: pointer; }
+.nn li:hover { outline: 1px solid var(--accent); }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; font-size: .92rem; }
+.checks .y::before { content: "✓ "; color: var(--ok); font-weight: 700; }
+.checks .n::before { content: "✗ "; color: var(--bad); font-weight: 700; }
+.status { font-size: .88rem; color: var(--muted); margin-top: 8px; }
+.status.err { color: var(--bad); }
+
+/* Explorer */
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.toolbar input { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; flex: 1 1 200px; min-width: 0; }
+.cmp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.cmp { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.cmp:hover { border-color: var(--accent); }
+.cmp .thumb { background: #fff; border-radius: 6px; height: 120px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cmp .thumb svg { max-width: 100%; max-height: 100%; }
+.cmp .thumb .ph { color: #888; font-size: .75rem; padding: 6px; word-break: break-all; }
+.cmp .nm { font-weight: 600; font-size: .9rem; margin-top: 6px; text-transform: capitalize; }
+
+.res-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.res-list a { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-decoration: none; color: var(--text); }
+.res-list a:hover { border-color: var(--accent); }
+.res-list a b { color: var(--link); }
+.res-list a span { display: block; color: var(--muted); font-size: .88rem; }
+footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .88rem; padding: 24px 16px; text-align: center; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#intro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2l8.66 5v10L12 22l-8.66-5V7z"/><path d="M12 8c-2 2-2 6 0 8M12 8c2 2 2 6 0 8" stroke-linecap="round"/></svg>
+      NP Explorer
+    </a>
+    <nav class="links" aria-label="Sections">
+      <a href="#sources">Sources</a>
+      <a href="#biosynthesis">Biosynthesis</a>
+      <a href="#classes">Classes</a>
+      <a href="#discovery">Discovery</a>
+      <a href="#drugs">Drugs</a>
+      <a href="#ml">ML model</a>
+      <a href="#lab">Molecule lab</a>
+      <a href="#explorer">Explorer</a>
+      <a href="#resources">Resources</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+
+<main>
+<!-- 1. INTRO -->
+<section class="hero" id="intro">
+  <div class="eyebrow">End-to-end guide</div>
+  <h1>Natural products: from organism to medicine to machine-learning model</h1>
+  <p class="lead">Natural products (NPs) are small molecules made by living organisms, mostly as <em>secondary metabolites</em>. The organism doesn't need them to grow, but they help it defend itself, compete and communicate. This page follows NPs from where they come from and how they are made, through isolation and drug development, to how this repository's model predicts their properties from structure.</p>
+  <div class="stats">
+    <div class="stat"><b>Primary vs secondary</b><span>Primary metabolites (sugars, amino acids, lipids) keep cells alive. Secondary metabolites are specialised and differ between species.</span></div>
+    <div class="stat"><b>Chemically distinctive</b><span>Compared with synthetic compounds, NPs are richer in sp³ carbons, stereocentres, oxygen and complex ring systems, and poorer in nitrogen and halogens.</span></div>
+    <div class="stat"><b>Medically important</b><span>A large share of approved small-molecule drugs are natural products, derived from them, or inspired by them (Newman &amp; Cragg, <i>J. Nat. Prod.</i> 2020).</span></div>
+    <div class="stat"><b>Try it here</b><span>Draw any molecule, compute its properties and predict its NP class in the <a href="#lab">Molecule lab</a>.</span></div>
+  </div>
+</section>
+
+<!-- 2. SOURCES -->
+<section id="sources">
+  <div class="eyebrow">Step 1 · Where they come from</div>
+  <h2>Sources of natural products</h2>
+  <p class="lead">Every group of living things produces specialised chemistry. Drug discovery has drawn most heavily on plants and soil microbes, and marine organisms are increasingly important.</p>
+  <div class="src-grid">
+    <div class="src"><div class="ico">🌿</div><b>Plants</b><span>Alkaloids, terpenoids, flavonoids, phenylpropanoids. Examples: morphine, paclitaxel, artemisinin.</span></div>
+    <div class="src"><div class="ico">🦠</div><b>Bacteria</b><span>Especially <i>Streptomyces</i>: polyketides and peptides. Examples: erythromycin, vancomycin, doxorubicin.</span></div>
+    <div class="src"><div class="ico">🍄</div><b>Fungi</b><span>β-lactams, statins and immunosuppressants. Examples: penicillin, lovastatin, cyclosporin.</span></div>
+    <div class="src"><div class="ico">🌊</div><b>Marine organisms</b><span>Sponges, tunicates and cone snails. Examples: trabectedin, ziconotide, cytarabine (inspired by sponge nucleosides).</span></div>
+    <div class="src"><div class="ico">🐍</div><b>Animals</b><span>Venoms and hormones. Example: captopril, which was designed from a peptide in the venom of the pit viper <i>Bothrops jararaca</i>.</span></div>
+    <div class="src"><div class="ico">🧬</div><b>Genomes and metagenomes</b><span>Silent biosynthetic gene clusters found by genome mining (antiSMASH) and expressed in a host organism.</span></div>
+  </div>
+</section>
+
+<!-- 3. BIOSYNTHESIS -->
+<section id="biosynthesis">
+  <div class="eyebrow">Step 2 · How organisms make them</div>
+  <h2>Biosynthesis: from photosynthesis to specialised metabolites</h2>
+  <p class="lead">All natural products are built from a handful of primary-metabolism building blocks. The pathway a compound comes from largely determines its chemical class. Click a coloured product box to jump to that class.</p>
+  <figure class="diagram" id="bioDiagram"><figcaption>Simplified biosynthetic map. Flavonoids have a mixed origin: a phenylpropanoid starter unit (4-coumaroyl-CoA) plus three malonyl-CoA units from the acetate pathway.</figcaption></figure>
+  <div class="grid-3">
+    <div class="card"><h3>Shikimate pathway</h3><p>PEP and erythrose-4-phosphate are converted into the aromatic amino acids phenylalanine, tyrosine and tryptophan. Removing ammonia from Phe with the enzyme PAL gives cinnamic acid, the entry point to phenylpropanoids, coumarins, lignans and (together with malonyl-CoA) flavonoids.</p></div>
+    <div class="card"><h3>Acetate–malonate pathway</h3><p>Acetyl-CoA is carboxylated to malonyl-CoA. Repeated Claisen condensations by polyketide synthases (PKS) build fatty acids, aromatic polyketides (tetracyclines, anthraquinones) and macrolides (erythromycin).</p></div>
+    <div class="card"><h3>Mevalonate and MEP pathways</h3><p>Both produce the C₅ building blocks IPP and DMAPP. Joining them head to tail gives GPP (C₁₀, monoterpenes), FPP (C₁₅, sesquiterpenes), GGPP (C₂₀, diterpenes) and squalene (C₃₀), which leads to triterpenes and steroids.</p></div>
+    <div class="card"><h3>Amino-acid-derived pathways</h3><p>Alkaloids form when amino acids (ornithine, lysine, tyrosine, tryptophan, anthranilate) are decarboxylated and cyclised. Examples: tropane alkaloids from ornithine, isoquinolines from tyrosine, indoles from tryptophan.</p></div>
+    <div class="card"><h3>Non-ribosomal peptides</h3><p>NRPS assembly lines connect amino acids, including non-proteinogenic and D-amino acids, without using a ribosome. Examples: penicillin (from the ACV tripeptide), vancomycin, cyclosporin.</p></div>
+    <div class="card"><h3>Tailoring enzymes</h3><p>After the scaffold is built, P450 oxidases, methyltransferases, glycosyltransferases and halogenases decorate it. These enzymes create most of the structural diversity within each class.</p></div>
+  </div>
+</section>
+
+<!-- 4. CLASSES -->
+<section id="classes">
+  <div class="eyebrow">Step 3 · What they look like</div>
+  <h2>Major structural classes</h2>
+  <p class="lead">Each card shows a typical example structure, drawn live with RDKit. The first four classes are the ones this repository's demo model is trained to recognise.</p>
+  <div class="grid-3" id="classCards"></div>
+</section>
+
+<!-- 5. DISCOVERY PIPELINE -->
+<section id="discovery">
+  <div class="eyebrow">Step 4 · From extract to pure compound to drug</div>
+  <h2>The natural-product drug-discovery pipeline</h2>
+  <p class="lead">Click any step in the diagram to see the methods, key decisions and typical outputs. The dashed arrow shows the loop between fractionation and bioassay: fractions are split again and again until a single active compound is left.</p>
+  <figure class="diagram" id="pipeDiagram"><figcaption>End-to-end workflow, from choosing a source organism to approval.</figcaption></figure>
+  <div class="card step-detail" id="stepDetail" aria-live="polite"></div>
+</section>
+
+<!-- 6. DRUGS -->
+<section id="drugs">
+  <div class="eyebrow">Step 5 · Impact</div>
+  <h2>Landmark drugs from nature</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Drug</th><th>Source organism</th><th>Class</th><th>Use</th></tr></thead>
+      <tbody id="drugRows"></tbody>
+    </table>
+  </div>
+  <div class="legend" id="drugLegend"></div>
+</section>
+
+<!-- 7. ML PIPELINE -->
+<section id="ml">
+  <div class="eyebrow">Step 6 · Computation</div>
+  <h2>Predicting natural-product properties with machine learning</h2>
+  <p class="lead">This repository's <code>np_model</code> package turns a structure into numbers and learns how those numbers relate to a property, such as compound class, bioactivity or toxicity. The same pipeline handles classification and regression.</p>
+  <figure class="diagram" id="mlDiagram"><figcaption>How <code>python -m np_model.train</code> works. Every box maps to a function in <code>np_model/</code>.</figcaption></figure>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Run it yourself</h3>
+<pre class="mono" style="white-space:pre-wrap;margin:0;background:var(--surface-2);padding:12px;border-radius:8px;overflow-x:auto">pip install -r requirements.txt
+
+# train (classification detected automatically)
+python -m np_model.train \
+  --data data/example_natural_products.csv \
+  --target compound_class --split scaffold \
+  --out models/np_class.joblib
+
+# predict new molecules
+python -m np_model.predict \
+  --model models/np_class.joblib \
+  --smiles "CC(C)=CCC/C(C)=C/CO"</pre>
+    </div>
+    <div class="card">
+      <h3>Why a scaffold split matters</h3>
+      <p>Natural products come in families that share a core, such as the flavone nucleus. A random split puts close relatives in both the training and test sets, which makes the model look better than it is. A <b>Bemis–Murcko scaffold split</b> keeps every molecule with the same core in the same fold, so the test measures how well the model handles <em>new</em> chemotypes.</p>
+      <p style="margin:0">Demo results (69 compounds, 4 classes): <b>0.94</b> accuracy with a random 5-fold split and <b>0.91</b> with a scaffold 5-fold split.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8. MOLECULE LAB -->
+<section id="lab">
+  <div class="eyebrow">Interactive tool</div>
+  <h2>Molecule lab</h2>
+  <p class="lead">Paste a SMILES string. RDKit, running in your browser, draws the structure and computes its properties. The page then compares it with the 69 labelled compounds from the demo dataset to predict its class.</p>
+  <div class="lab">
+    <div class="card">
+      <div class="input-row">
+        <input id="smiles" type="text" spellcheck="false" autocomplete="off" aria-label="SMILES" placeholder="Enter a SMILES, e.g. O=c1cc(-c2ccccc2)oc2ccccc12">
+        <button class="primary" id="goBtn">Analyse</button>
+      </div>
+      <div class="chips" id="exampleChips"></div>
+      <div class="mol-view" id="molView"><div class="ph">The structure will appear here.</div></div>
+      <div class="status" id="labStatus">Loading RDKit…</div>
+    </div>
+    <div class="card" id="labResults">
+      <h3>Predicted class</h3>
+      <div class="pred" id="predMain"><span class="hint">Analyse a molecule to see its prediction.</span></div>
+      <div class="bars" id="predBars"></div>
+      <p class="hint" style="margin-top:10px">Method: 5-nearest-neighbour vote using Tanimoto similarity on Morgan fingerprints (radius 2, 2048 bits), weighted by similarity. This is a lightweight in-browser stand-in for the repository's Random Forest model.</p>
+      <h3 style="margin-top:18px">Most similar demo compounds</h3>
+      <ul class="nn" id="nnList"></ul>
+      <h3 style="margin-top:18px">Properties</h3>
+      <div class="kv" id="descGrid"></div>
+      <h3 style="margin-top:18px">Rules of thumb</h3>
+      <ul class="checks" id="checks"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 9. EXPLORER -->
+<section id="explorer">
+  <div class="eyebrow">Dataset</div>
+  <h2>Demo dataset explorer</h2>
+  <p class="lead">These are the 69 compounds in <code>data/example_natural_products.csv</code>. Click any compound to open it in the molecule lab.</p>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search by name…" aria-label="Search compounds">
+    <div class="chips" id="classFilter" style="margin:0"></div>
+  </div>
+  <div class="cmp-grid" id="cmpGrid"></div>
+</section>
+
+<!-- 10. RESOURCES -->
+<section id="resources">
+  <div class="eyebrow">Go further</div>
+  <h2>Databases and tools</h2>
+  <div class="res-list">
+    <a href="https://coconut.naturalproducts.net" target="_blank" rel="noopener"><b>COCONUT</b><span>Large open collection of natural-product structures</span></a>
+    <a href="https://lotus.naturalproducts.net" target="_blank" rel="noopener"><b>LOTUS</b><span>Structure–organism pairs: which organism makes which compound</span></a>
+    <a href="https://bidd.group/NPASS/" target="_blank" rel="noopener"><b>NPASS</b><span>Natural products with quantitative activity data against targets</span></a>
+    <a href="https://www.npatlas.org" target="_blank" rel="noopener"><b>NP Atlas</b><span>Microbial natural products with literature references</span></a>
+    <a href="https://www.ebi.ac.uk/chembl/" target="_blank" rel="noopener"><b>ChEMBL</b><span>Bioactivity data (IC₅₀, Kᵢ…) for QSAR modelling</span></a>
+    <a href="https://pubchem.ncbi.nlm.nih.gov" target="_blank" rel="noopener"><b>PubChem</b><span>Structures, bioassays and literature links</span></a>
+    <a href="https://gnps.ucsd.edu" target="_blank" rel="noopener"><b>GNPS</b><span>MS/MS molecular networking for dereplication</span></a>
+    <a href="https://antismash.secondarymetabolites.org" target="_blank" rel="noopener"><b>antiSMASH</b><span>Finds biosynthetic gene clusters in genomes</span></a>
+    <a href="https://www.rdkit.org" target="_blank" rel="noopener"><b>RDKit</b><span>Open-source cheminformatics toolkit used by this project</span></a>
+  </div>
+</section>
+</main>
+
+<footer>
+  NP Explorer is part of the <b>RS_naturalproduct</b> repository. Structures are drawn with <a href="https://www.rdkit.org/docs/JScript.html" target="_blank" rel="noopener">RDKit.js</a>. This page is for education and research, not medical advice.
+</footer>
+
+<script>
+// ---------------------------------------------------------------- data
+const DATA = [{"name":"caffeine","smiles":"Cn1cnc2c1c(=O)n(C)c(=O)n2C","cls":"alkaloid"},{"name":"theobromine","smiles":"Cn1cnc2c1c(=O)[nH]c(=O)n2C","cls":"alkaloid"},{"name":"nicotine","smiles":"CN1CCC[C@H]1c1cccnc1","cls":"alkaloid"},{"name":"morphine","smiles":"CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5","cls":"alkaloid"},{"name":"codeine","smiles":"COc1ccc2C[C@H]3N(C)CC[C@@]45[C@@H](Oc1c24)[C@@H](O)C=C[C@@H]35","cls":"alkaloid"},{"name":"quinine","smiles":"COc1ccc2nccc([C@@H](O)[C@@H]3C[C@@H]4CCN3C[C@@H]4C=C)c2c1","cls":"alkaloid"},{"name":"atropine","smiles":"CN1C2CCC1CC(C2)OC(=O)C(CO)c1ccccc1","cls":"alkaloid"},{"name":"scopolamine","smiles":"CN1[C@@H]2CC(C[C@H]1[C@H]1O[C@@H]21)OC(=O)C(CO)c1ccccc1","cls":"alkaloid"},{"name":"cocaine","smiles":"COC(=O)[C@H]1[C@@H](OC(=O)c2ccccc2)C[C@@H]2CC[C@H]1N2C","cls":"alkaloid"},{"name":"berberine","smiles":"COc1ccc2cc3[n+](cc2c1OC)CCc1cc2OCOc2cc1-3","cls":"alkaloid"},{"name":"papaverine","smiles":"COc1ccc(Cc2nccc3cc(OC)c(OC)cc23)cc1OC","cls":"alkaloid"},{"name":"strychnine","smiles":"O=C1C[C@H]2OCC=C3CN4CC[C@]56[C@H]4C[C@H]3[C@H]2[C@H]6N1c1ccccc15","cls":"alkaloid"},{"name":"piperine","smiles":"O=C(/C=C/C=C/c1ccc2OCOc2c1)N1CCCCC1","cls":"alkaloid"},{"name":"ephedrine","smiles":"CN[C@@H](C)[C@H](O)c1ccccc1","cls":"alkaloid"},{"name":"harmine","smiles":"COc1ccc2c(c1)[nH]c1c(C)nccc12","cls":"alkaloid"},{"name":"camptothecin","smiles":"CC[C@@]1(O)C(=O)OCc2c1cc1-c3nc4ccccc4cc3Cn1c2=O","cls":"alkaloid"},{"name":"capsaicin","smiles":"COc1cc(CNC(=O)CCCC/C=C/C(C)C)ccc1O","cls":"alkaloid"},{"name":"quercetin","smiles":"O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"kaempferol","smiles":"O=c1c(O)c(-c2ccc(O)cc2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"myricetin","smiles":"O=c1c(O)c(-c2cc(O)c(O)c(O)c2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"apigenin","smiles":"O=c1cc(-c2ccc(O)cc2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"luteolin","smiles":"O=c1cc(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"chrysin","smiles":"O=c1cc(-c2ccccc2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"naringenin","smiles":"O=C1C[C@@H](c2ccc(O)cc2)Oc2cc(O)cc(O)c21","cls":"flavonoid"},{"name":"hesperetin","smiles":"COc1ccc([C@@H]2CC(=O)c3c(O)cc(O)cc3O2)cc1O","cls":"flavonoid"},{"name":"genistein","smiles":"O=c1c(-c2ccc(O)cc2)coc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"daidzein","smiles":"O=c1c(-c2ccc(O)cc2)coc2cc(O)ccc12","cls":"flavonoid"},{"name":"biochanin_a","smiles":"COc1ccc(-c2coc3cc(O)cc(O)c3c2=O)cc1","cls":"flavonoid"},{"name":"catechin","smiles":"O[C@@H]1Cc2c(O)cc(O)cc2O[C@H]1c1ccc(O)c(O)c1","cls":"flavonoid"},{"name":"epicatechin","smiles":"O[C@@H]1Cc2c(O)cc(O)cc2O[C@@H]1c1ccc(O)c(O)c1","cls":"flavonoid"},{"name":"baicalein","smiles":"O=c1cc(-c2ccccc2)oc2cc(O)c(O)c(O)c12","cls":"flavonoid"},{"name":"fisetin","smiles":"O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)ccc12","cls":"flavonoid"},{"name":"galangin","smiles":"O=c1c(O)c(-c2ccccc2)oc2cc(O)cc(O)c12","cls":"flavonoid"},{"name":"tangeretin","smiles":"COc1ccc(-c2cc(=O)c3c(OC)c(OC)c(OC)c(OC)c3o2)cc1","cls":"flavonoid"},{"name":"menthol","smiles":"CC(C)[C@@H]1CC[C@@H](C)C[C@H]1O","cls":"terpenoid"},{"name":"limonene","smiles":"CC1=CC[C@@H](CC1)C(C)=C","cls":"terpenoid"},{"name":"geraniol","smiles":"CC(C)=CCC/C(C)=C/CO","cls":"terpenoid"},{"name":"linalool","smiles":"CC(C)=CCCC(C)(O)C=C","cls":"terpenoid"},{"name":"camphor","smiles":"CC1(C)[C@@H]2CC[C@@]1(C)C(=O)C2","cls":"terpenoid"},{"name":"borneol","smiles":"CC1(C)[C@@H]2CC[C@@]1(C)[C@@H](O)C2","cls":"terpenoid"},{"name":"alpha_pinene","smiles":"CC1=CC[C@@H]2C[C@H]1C2(C)C","cls":"terpenoid"},{"name":"carvone","smiles":"CC(=C)[C@@H]1CC=C(C)C(=O)C1","cls":"terpenoid"},{"name":"thymol","smiles":"Cc1ccc(C(C)C)c(O)c1","cls":"terpenoid"},{"name":"eucalyptol","smiles":"CC12CCC(CC1)C(C)(C)O2","cls":"terpenoid"},{"name":"citral","smiles":"CC(C)=CCC/C(C)=C/C=O","cls":"terpenoid"},{"name":"farnesol","smiles":"CC(C)=CCC/C(C)=C/CC/C(C)=C/CO","cls":"terpenoid"},{"name":"beta_caryophyllene","smiles":"C/C1=C\\CCC(=C)[C@H]2CC(C)(C)[C@@H]2CC1","cls":"terpenoid"},{"name":"artemisinin","smiles":"C[C@@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4","cls":"terpenoid"},{"name":"parthenolide","smiles":"C/C1=C\\CC[C@@]2(C)O[C@@H]2[C@H]2OC(=O)C(=C)[C@@H]2CC1","cls":"terpenoid"},{"name":"abietic_acid","smiles":"CC(C)C1=CC2=CC[C@H]3[C@](C)(CCC[C@@]3(C)C(=O)O)[C@H]2CC1","cls":"terpenoid"},{"name":"oleanolic_acid","smiles":"CC1(C)CC[C@]2(C(=O)O)CC[C@]3(C)C(=CC[C@@H]4[C@@]5(C)CC[C@H](O)C(C)(C)[C@@H]5CC[C@]43C)[C@@H]2C1","cls":"terpenoid"},{"name":"squalene","smiles":"CC(C)=CCC/C(C)=C/CC/C(C)=C/CC/C=C(\\C)CC/C=C(\\C)CCC=C(C)C","cls":"terpenoid"},{"name":"coumarin","smiles":"O=c1ccc2ccccc2o1","cls":"phenylpropanoid"},{"name":"umbelliferone","smiles":"O=c1ccc2ccc(O)cc2o1","cls":"phenylpropanoid"},{"name":"scopoletin","smiles":"COc1cc2ccc(=O)oc2cc1O","cls":"phenylpropanoid"},{"name":"scoparone","smiles":"COc1cc2ccc(=O)oc2cc1OC","cls":"phenylpropanoid"},{"name":"esculetin","smiles":"O=c1ccc2cc(O)c(O)cc2o1","cls":"phenylpropanoid"},{"name":"psoralen","smiles":"O=c1ccc2cc3ccoc3cc2o1","cls":"phenylpropanoid"},{"name":"bergapten","smiles":"COc1c2ccoc2cc2oc(=O)ccc12","cls":"phenylpropanoid"},{"name":"osthole","smiles":"COc1ccc2ccc(=O)oc2c1CC=C(C)C","cls":"phenylpropanoid"},{"name":"caffeic_acid","smiles":"O=C(O)/C=C/c1ccc(O)c(O)c1","cls":"phenylpropanoid"},{"name":"ferulic_acid","smiles":"COc1cc(/C=C/C(=O)O)ccc1O","cls":"phenylpropanoid"},{"name":"p_coumaric_acid","smiles":"O=C(O)/C=C/c1ccc(O)cc1","cls":"phenylpropanoid"},{"name":"sinapic_acid","smiles":"COc1cc(/C=C/C(=O)O)cc(OC)c1O","cls":"phenylpropanoid"},{"name":"cinnamaldehyde","smiles":"O=C/C=C/c1ccccc1","cls":"phenylpropanoid"},{"name":"eugenol","smiles":"C=CCc1ccc(O)c(OC)c1","cls":"phenylpropanoid"},{"name":"anethole","smiles":"C/C=C/c1ccc(OC)cc1","cls":"phenylpropanoid"},{"name":"chlorogenic_acid","smiles":"O=C(/C=C/c1ccc(O)c(O)c1)O[C@@H]1C[C@](O)(C(=O)O)C[C@@H](O)[C@H]1O","cls":"phenylpropanoid"},{"name":"rosmarinic_acid","smiles":"O=C(O)[C@@H](Cc1ccc(O)c(O)c1)OC(=O)/C=C/c1ccc(O)c(O)c1","cls":"phenylpropanoid"}];
+const CLASS_KEYS = ["alkaloid", "flavonoid", "terpenoid", "phenylpropanoid"];
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const classColor = c => `var(--c-${c})`;
+
+const CLASSES = [
+  { key: "alkaloid", name: "Alkaloids", example: "morphine", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5",
+    origin: "Amino acids (Orn, Lys, Tyr, Trp) → decarboxylation, cyclisation",
+    features: "Basic nitrogen, usually in a ring. Often bitter and strongly bioactive.",
+    examples: "Morphine, quinine, caffeine, nicotine, vinblastine, berberine" },
+  { key: "flavonoid", name: "Flavonoids", example: "quercetin", smiles: "O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12",
+    origin: "4-Coumaroyl-CoA + 3 × malonyl-CoA → chalcone (chalcone synthase)",
+    features: "C6–C3–C6 skeleton (two aromatic rings joined by a pyran ring), polyphenolic, often glycosylated",
+    examples: "Quercetin, apigenin, genistein, catechin, naringenin, silibinin" },
+  { key: "terpenoid", name: "Terpenoids", example: "artemisinin", smiles: "C[C@@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4",
+    origin: "IPP/DMAPP (C₅) from the mevalonate or MEP pathway",
+    features: "Carbon count is a multiple of 5 (C₁₀, C₁₅, C₂₀, C₃₀…). High Fsp³, many stereocentres, few N atoms.",
+    examples: "Menthol, limonene, artemisinin, paclitaxel, oleanolic acid" },
+  { key: "phenylpropanoid", name: "Phenylpropanoids", example: "scopoletin", smiles: "COc1cc2ccc(=O)oc2cc1O",
+    origin: "Phenylalanine → cinnamic acid (PAL) → hydroxylation and methylation",
+    features: "C6–C3 unit. Includes cinnamic acids, coumarins, lignans and lignin.",
+    examples: "Caffeic acid, eugenol, coumarin, psoralen, podophyllotoxin" },
+  { key: "polyketide", name: "Polyketides", example: "6-methylsalicylic acid", smiles: "Cc1cccc(O)c1C(=O)O",
+    origin: "Acetyl-CoA + malonyl-CoA units (polyketide synthases)",
+    features: "Alternating oxygen pattern (1,3-dioxygenation). Aromatic polyketides or large macrolide rings.",
+    examples: "Erythromycin, tetracycline, doxorubicin, lovastatin, rapamycin" },
+  { key: "peptide", name: "Non-ribosomal peptides", example: "penicillin G", smiles: "CC1(C)S[C@@H]2[C@H](NC(=O)Cc3ccccc3)C(=O)N2[C@H]1C(=O)O",
+    origin: "Amino acids assembled by NRPS enzymes (no ribosome)",
+    features: "D-amino acids, N-methylation, macrocycles. Often antibiotics or immunosuppressants.",
+    examples: "Penicillin, vancomycin, cyclosporin, daptomycin, bleomycin" },
+];
+
+const DRUGS = [
+  ["Morphine", "Opium poppy (<i>Papaver somniferum</i>)", "alkaloid", "Severe pain"],
+  ["Quinine", "Cinchona bark (<i>Cinchona</i> spp.)", "alkaloid", "Malaria"],
+  ["Vinblastine", "Madagascar periwinkle (<i>Catharanthus roseus</i>)", "alkaloid", "Cancer (lymphomas)"],
+  ["Artemisinin", "Sweet wormwood (<i>Artemisia annua</i>)", "terpenoid", "Malaria (Nobel Prize 2015)"],
+  ["Paclitaxel", "Pacific yew (<i>Taxus brevifolia</i>)", "terpenoid", "Breast, ovarian and lung cancer"],
+  ["Etoposide", "Semi-synthetic, from podophyllotoxin (<i>Podophyllum</i>)", "phenylpropanoid", "Cancer (lignan-derived)"],
+  ["Penicillin G", "<i>Penicillium</i> mould", "peptide", "Bacterial infections"],
+  ["Cyclosporin", "Fungus <i>Tolypocladium inflatum</i>", "peptide", "Preventing transplant rejection"],
+  ["Erythromycin", "<i>Saccharopolyspora erythraea</i>", "polyketide", "Bacterial infections"],
+  ["Lovastatin", "<i>Aspergillus terreus</i>", "polyketide", "High cholesterol"],
+  ["Doxorubicin", "<i>Streptomyces peucetius</i>", "polyketide", "Cancer"],
+  ["Ziconotide", "Cone snail (<i>Conus magus</i>)", "peptide", "Severe chronic pain (a ribosomal peptide)"],
+  ["Aspirin", "Derived from salicin in willow bark (<i>Salix</i>)", "phenylpropanoid", "Pain, inflammation, heart protection"],
+];
+
+const STEPS = [
+  { t: "Source selection", s: "ethnobotany · biodiversity", body: [
+      "Choose organisms using ethnobotanical knowledge (traditional medicine), ecological reasoning (e.g. defence chemistry) or taxonomy.",
+      "Microbial strains from unusual niches such as marine sediments, insect symbionts or extreme environments.",
+      "Genome mining: search sequenced genomes for biosynthetic gene clusters (antiSMASH).",
+      "Respect the Nagoya Protocol on access and benefit-sharing." ],
+    out: "A prioritised list of organisms or strains" },
+  { t: "Collection & ID", s: "voucher specimens", body: [
+      "Collect material and record location, season and plant part. The chemistry varies with all three.",
+      "Have a taxonomist confirm the species and deposit a voucher specimen in a herbarium.",
+      "Microbes: isolate pure cultures and identify them by 16S rRNA or ITS sequencing." ],
+    out: "Authenticated, dried and ground material, or a fermentation broth" },
+  { t: "Extraction", s: "maceration · Soxhlet · UAE · SFE", body: [
+      "Extract with solvents of increasing polarity (hexane → ethyl acetate → methanol) to separate compounds roughly by polarity.",
+      "Modern methods: ultrasound-assisted (UAE), microwave-assisted (MAE), pressurised liquid, and supercritical CO₂ (SFE).",
+      "Concentrate the extract under reduced pressure and record the yield." ],
+    out: "Crude extracts" },
+  { t: "Screening", s: "bioassays · HTS", body: [
+      "Test crude extracts in cell-based or target-based assays, e.g. antimicrobial MIC, cytotoxicity (MTT), enzyme inhibition or receptor binding.",
+      "Remove nuisance or promiscuous activity: tannins, detergent-like compounds and PAINS.",
+      "Rank the hits by potency and selectivity." ],
+    out: "Active ('hit') extracts" },
+  { t: "Dereplication", s: "LC-MS/MS · GNPS", body: [
+      "Identify compounds that are already known early, so no time is spent re-isolating them.",
+      "Compare LC-HRMS/MS spectra with databases and use molecular networking (GNPS) to spot families of related compounds.",
+      "Check UV spectra and molecular formulas against COCONUT, LOTUS and the Dictionary of Natural Products." ],
+    out: "A list of likely-known versus possibly-new compounds" },
+  { t: "Fractionation", s: "partition · column chromatography", body: [
+      "Liquid–liquid partitioning, then chromatography: silica, reversed-phase C18, Sephadex LH-20 and flash chromatography.",
+      "Bioassay-guided: test every fraction and continue only with the active ones. This is the loop in the diagram.",
+      "Track progress with TLC and HPLC profiles." ],
+    out: "Enriched active fractions" },
+  { t: "Isolation", s: "prep-HPLC · crystallisation", body: [
+      "Purify single compounds by preparative or semi-preparative HPLC, counter-current chromatography or crystallisation.",
+      "Check purity by HPLC-UV, ELSD or MS and by ¹H NMR, aiming for more than 95% purity for bioassays.",
+      "Amounts are often only milligrams, which is why supply is a recurring problem." ],
+    out: "Pure compounds" },
+  { t: "Structure elucidation", s: "NMR · HRMS · X-ray · ECD", body: [
+      "HR-MS gives the molecular formula. ¹H and ¹³C NMR plus 2D experiments (COSY, HSQC, HMBC, NOESY/ROESY) establish connectivity and relative configuration.",
+      "Absolute configuration: X-ray crystallography, ECD spectra compared with DFT calculations, or Mosher ester analysis.",
+      "Computer-assisted structure elucidation and DP4+ NMR prediction help decide between candidate structures." ],
+    out: "A complete 3D structure, i.e. a SMILES with stereochemistry" },
+  { t: "Bioactivity & MoA", s: "IC₅₀ · target ID", body: [
+      "Dose–response curves (IC₅₀/EC₅₀), selectivity panels and cytotoxicity counter-screens.",
+      "Find the molecular target with chemical proteomics, thermal shift assays, genetics or docking.",
+      "Machine-learning models like this repo's can prioritise compounds and suggest analogues." ],
+    out: "A validated hit with a known mechanism" },
+  { t: "Lead optimisation", s: "semi-synthesis · SAR · ADMET", body: [
+      "Semi-synthesis and total synthesis to build structure–activity relationships (SAR).",
+      "Improve solubility, stability, oral bioavailability and safety (ADMET).",
+      "Solve supply problems through total synthesis, fermentation, plant cell culture or engineered microbes (e.g. semi-synthetic artemisinin from yeast)." ],
+    out: "A preclinical candidate" },
+  { t: "Preclinical", s: "in vivo · toxicology", body: [
+      "Efficacy in animal models, pharmacokinetics (PK) and safety pharmacology.",
+      "GLP toxicology studies, then scaled-up production to GMP standards.",
+      "Regulatory filing (IND/CTA) before human trials." ],
+    out: "Approval to start human trials" },
+  { t: "Clinical & approval", s: "phase I–III · regulators", body: [
+      "Phase I (safety and dose in healthy volunteers), Phase II (efficacy and side effects in patients), Phase III (large confirmatory trials).",
+      "Regulatory review (e.g. FDA, EMA, CDSCO), then Phase IV monitoring after the drug reaches the market." ],
+    out: "An approved medicine" },
+];
+
+// ---------------------------------------------------------------- diagram helper
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function drawDiagram(host, { w, h, nodes, edges, bands = [] }, onClick) {
+  const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, role: "img" });
+  const defs = el("defs", {}, svg);
+  const mk = el("marker", { id: host.id + "-arr", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+  el("path", { d: "M0,0 L10,5 L0,10 z", class: "arrowhead" }, mk);
+  for (const b of bands) { const t = el("text", { x: b.x, y: b.y, class: "band" }, svg); t.textContent = b.text; }
+  const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const eg = el("g", {}, svg);
+  for (const e of edges) {
+    const a = byId[e.from], b = byId[e.to];
+    const side = e.side || "v";
+    let d, lx, ly;
+    if (side === "h") {
+      const dir = b.x > a.x ? 1 : -1;
+      const x1 = a.x + dir * a.w / 2, y1 = a.y, x2 = b.x - dir * b.w / 2, y2 = b.y;
+      const mx = (x1 + x2) / 2;
+      d = `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; lx = mx; ly = Math.min(y1, y2) - 6;
+    } else if (side === "arc") {
+      const x1 = a.x, y1 = a.y - a.h / 2, x2 = b.x, y2 = b.y - b.h / 2, dy = e.dy || 40;
+      d = `M${x1},${y1} C${x1},${y1 - dy} ${x2},${y2 - dy} ${x2},${y2}`; lx = (x1 + x2) / 2; ly = Math.min(y1, y2) - dy * .75 - 6;
+    } else if (side === "loop") {
+      const x1 = a.x, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2, dy = e.dy || 46;
+      d = `M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 + dy} ${x2},${y2}`; lx = (x1 + x2) / 2; ly = Math.max(y1, y2) + dy * .75 + 4;
+    } else {
+      const down = b.y > a.y;
+      const x1 = a.x + (e.dx1 || 0), y1 = a.y + (down ? a.h / 2 : -a.h / 2);
+      const x2 = b.x + (e.dx2 || 0), y2 = b.y + (down ? -b.h / 2 : b.h / 2);
+      const my = (y1 + y2) / 2;
+      d = `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`; lx = (x1 + x2) / 2 + 6; ly = my;
+    }
+    el("path", { d, class: "edge" + (side === "loop" || side === "arc" ? " loop" : ""), "marker-end": `url(#${host.id}-arr)` }, eg);
+    if (e.label) { const t = el("text", { x: lx, y: ly, class: "edge-label", "text-anchor": "middle" }, eg); t.textContent = e.label; }
+  }
+  const ng = el("g", {}, svg);
+  nodes.forEach((n, i) => {
+    const g = el("g", { class: "node" + (onClick && n.click !== false ? " clickable" : ""), "data-id": n.id }, ng);
+    const r = el("rect", { x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 9 }, g);
+    if (n.color) { r.style.stroke = n.color; r.style.strokeWidth = 2.2; }
+    if (n.num) {
+      const bx = n.x - n.w / 2 + 4, by = n.y - n.h / 2 + 2;
+      el("circle", { cx: bx, cy: by, r: 10, fill: "var(--accent)" }, g);
+      const tn = el("text", { x: bx, y: by + 4, "text-anchor": "middle" }, g);
+      tn.textContent = n.num; tn.style.fill = "#fff"; tn.style.fontSize = "11px";
+    }
+    const cx = n.x;
+    const t = el("text", { x: cx, y: n.y + (n.sub ? -3 : 4), "text-anchor": "middle" }, g);
+    t.textContent = n.label;
+    if (n.color) t.style.fill = n.color;
+    if (n.sub) { const s = el("text", { x: cx, y: n.y + 13, "text-anchor": "middle", class: "sub" }, g); s.textContent = n.sub; }
+    if (onClick && n.click !== false) {
+      g.setAttribute("tabindex", "0"); g.setAttribute("role", "button");
+      g.setAttribute("aria-label", n.label);
+      g.addEventListener("click", () => onClick(n, g, svg));
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onClick(n, g, svg); } });
+    }
+  });
+  host.insertBefore(svg, host.firstChild);
+  return svg;
+}
+
+// Biosynthesis map
+(function () {
+  const H = 46;
+  const N = (id, x, y, w, label, sub, extra = {}) => ({ id, x, y, w, h: H, label, sub, ...extra });
+  const cc = k => classColor(k);
+  const nodes = [
+    N("photo", 450, 34, 250, "CO₂ + H₂O + light", "photosynthesis → glucose", { click: false }),
+    N("e4p", 150, 118, 210, "PEP + erythrose-4-P", "from glycolysis / pentose phosphate", { click: false }),
+    N("pyr", 450, 118, 170, "Pyruvate", "glycolysis", { click: false }),
+    N("g3p", 760, 118, 200, "Pyruvate + G3P", "plastids (plants, bacteria)", { click: false }),
+    N("shik", 150, 202, 190, "Shikimate pathway", "shikimic acid → chorismate", { click: false }),
+    N("acoa", 450, 202, 170, "Acetyl-CoA", "", { click: false }),
+    N("mep", 760, 202, 170, "MEP pathway", "", { click: false }),
+    N("aa", 125, 290, 200, "Aromatic amino acids", "Phe · Tyr · Trp", { click: false }),
+    N("mal", 330, 290, 150, "Malonyl-CoA", "acetate pathway", { click: false }),
+    N("tca", 520, 290, 170, "TCA cycle", "→ Orn, Lys (amino acids)", { click: false }),
+    N("mva", 700, 290, 150, "Mevalonate", "pathway", { click: false }),
+    N("ipp", 760, 378, 170, "IPP + DMAPP", "C₅ isoprene units", { click: false }),
+    N("cin", 100, 378, 150, "Cinnamic acid", "PAL enzyme", { click: false }),
+    N("P_phen", 80, 470, 150, "Phenylpropanoids", "coumarins · lignans", { color: cc("phenylpropanoid"), cls: "phenylpropanoid" }),
+    N("P_flav", 250, 470, 150, "Flavonoids", "C6–C3–C6", { color: cc("flavonoid"), cls: "flavonoid" }),
+    N("P_alk", 420, 470, 150, "Alkaloids", "N-heterocycles", { color: cc("alkaloid"), cls: "alkaloid" }),
+    N("P_pk", 590, 470, 150, "Polyketides", "& fatty acids", { color: cc("polyketide"), cls: "polyketide" }),
+    N("P_terp", 800, 470, 170, "Terpenoids", "& steroids", { color: cc("terpenoid"), cls: "terpenoid" }),
+  ];
+  const edges = [
+    { from: "photo", to: "e4p" }, { from: "photo", to: "pyr" }, { from: "photo", to: "g3p" },
+    { from: "e4p", to: "shik" }, { from: "pyr", to: "acoa" }, { from: "g3p", to: "mep" },
+    { from: "shik", to: "aa" }, { from: "acoa", to: "mal" }, { from: "acoa", to: "tca" }, { from: "acoa", to: "mva" },
+    { from: "mva", to: "ipp" }, { from: "mep", to: "ipp", dx1: 0 },
+    { from: "aa", to: "cin", dx1: -25 }, { from: "cin", to: "P_phen" }, { from: "cin", to: "P_flav", label: "+ 3 malonyl" },
+    { from: "mal", to: "P_flav" }, { from: "aa", to: "P_alk", dx1: 60 }, { from: "tca", to: "P_alk" },
+    { from: "mal", to: "P_pk" }, { from: "ipp", to: "P_terp" },
+  ];
+  drawDiagram(document.getElementById("bioDiagram"), { w: 900, h: 505, nodes, edges }, n => {
+    if (n.cls) document.getElementById("class-" + n.cls)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+})();
+
+// Discovery pipeline (two-row snake)
+(function () {
+  const H = 54, cols = 6, x0 = 92, dx = 179, y1 = 86, y2 = 214;
+  const nodes = STEPS.map((s, i) => {
+    const row = i < cols ? 0 : 1, col = row === 0 ? i : (2 * cols - 1 - i);
+    return { id: "s" + i, idx: i, x: x0 + col * dx, y: row === 0 ? y1 : y2, w: 166, h: H, label: s.t,
+             sub: s.s.length > 22 ? s.s.split(" · ")[0] : s.s, num: i + 1 };
+  });
+  const edges = [];
+  for (let i = 0; i < STEPS.length - 1; i++) edges.push({ from: "s" + i, to: "s" + (i + 1), side: i === cols - 1 ? "v" : "h" });
+  edges.push({ from: "s5", to: "s3", side: "arc", label: "bioassay-guided loop: re-test fractions", dy: 44 });
+  const svg = drawDiagram(document.getElementById("pipeDiagram"), { w: 1080, h: 250, nodes, edges }, (n, g, svgEl) => selectStep(n.idx, svgEl));
+  selectStep(0, svg);
+})();
+
+function selectStep(i, svg) {
+  svg = svg || document.querySelector("#pipeDiagram svg");
+  svg.querySelectorAll(".node").forEach(g => g.classList.toggle("sel", g.dataset.id === "s" + i));
+  const s = STEPS[i];
+  document.getElementById("stepDetail").innerHTML =
+    `<h3><span class="num">${i + 1}</span>${s.t} <span class="pill">${s.s}</span></h3>
+     <ul>${s.body.map(b => `<li>${b}</li>`).join("")}</ul>
+     <p class="hint" style="margin:10px 0 0"><b>Output:</b> ${s.out} · ${i < STEPS.length - 1 ? `Next: <a href="#discovery" data-step="${i + 1}">${STEPS[i + 1].t} →</a>` : "End of the pipeline."}</p>`;
+  document.querySelector("#stepDetail a[data-step]")?.addEventListener("click", ev => { ev.preventDefault(); selectStep(i + 1); });
+}
+
+// ML pipeline
+(function () {
+  const H = 56, y = 70, y2 = 190;
+  const nodes = [
+    { id: "csv", x: 90, y, w: 150, h: H, label: "CSV input", sub: "SMILES + target" },
+    { id: "parse", x: 265, y, w: 150, h: H, label: "Parse SMILES", sub: "RDKit · drop invalid" },
+    { id: "feat", x: 460, y, w: 190, h: H, label: "Featurise", sub: "Morgan r2 2048 + 14 desc." },
+    { id: "task", x: 665, y, w: 170, h: H, label: "Detect task", sub: "class ↔ regression" },
+    { id: "cv", x: 810, y: y2, w: 150, h: H, label: "Cross-validate", sub: "random / scaffold" },
+    { id: "rf", x: 610, y: y2, w: 170, h: H, label: "Random Forest", sub: "refit on all data" },
+    { id: "save", x: 400, y: y2, w: 170, h: H, label: "Save bundle", sub: "model.joblib + metrics" },
+    { id: "pred", x: 180, y: y2, w: 190, h: H, label: "Predict new", sub: "class + probability / ±std" },
+  ];
+  const edges = [
+    { from: "csv", to: "parse", side: "h" }, { from: "parse", to: "feat", side: "h" }, { from: "feat", to: "task", side: "h" },
+    { from: "task", to: "cv" }, { from: "cv", to: "rf", side: "h" }, { from: "rf", to: "save", side: "h" }, { from: "save", to: "pred", side: "h" },
+  ];
+  drawDiagram(document.getElementById("mlDiagram"), { w: 900, h: 240, nodes, edges });
+})();
+
+// Drugs table
+(function () {
+  document.getElementById("drugRows").innerHTML = DRUGS.map(([d, s, c, u]) =>
+    `<tr><td><b>${d}</b></td><td>${s}</td><td><span class="pill cls" style="background:${classColor(c)}">${c}</span></td><td>${u}</td></tr>`).join("");
+})();
+
+// ---------------------------------------------------------------- RDKit-powered parts
+let RD = null;
+const fpCache = new Map();
+
+function getMol(smi) {
+  if (!RD) return null;
+  try { const m = RD.get_mol(smi); if (m && m.is_valid()) return m; if (m) m.delete(); } catch (e) {}
+  return null;
+}
+function svgFor(smi, w, h) {
+  const m = getMol(smi); if (!m) return null;
+  try {
+    return m.get_svg_with_highlights(JSON.stringify({ width: w, height: h, bondLineWidth: 1.4, addStereoAnnotation: false, clearBackground: false }));
+  } catch (e) { return m.get_svg(w, h); } finally { m.delete(); }
+}
+function fpBits(smi) {
+  if (fpCache.has(smi)) return fpCache.get(smi);
+  const m = getMol(smi); if (!m) return null;
+  const s = m.get_morgan_fp(JSON.stringify({ radius: 2, nBits: 2048 })); m.delete();
+  const on = []; for (let i = 0; i < s.length; i++) if (s[i] === "1") on.push(i);
+  const set = new Set(on); fpCache.set(smi, set); return set;
+}
+function tanimoto(a, b) {
+  let c = 0; const [s, l] = a.size < b.size ? [a, b] : [b, a];
+  for (const x of s) if (l.has(x)) c++;
+  const u = a.size + b.size - c; return u ? c / u : 0;
+}
+
+function renderClassCards() {
+  document.getElementById("classCards").innerHTML = CLASSES.map(c => `
+    <article class="card class-card" id="class-${c.key}" style="--cc:${classColor(c.key)}">
+      <h3 style="margin:0">${c.name}</h3>
+      <div class="struct" data-smiles="${c.smiles}"><span class="ph">${c.example}</span></div>
+      <div class="hint" style="margin-top:-6px">Example: <span style="text-transform:capitalize">${c.example}</span>${CLASS_KEYS.includes(c.key) ? ' · <span class="pill">in demo model</span>' : ""}</div>
+      <dl>
+        <dt>Biosynthetic origin</dt><dd>${c.origin}</dd>
+        <dt>Hallmarks</dt><dd>${c.features}</dd>
+        <dt>Examples</dt><dd>${c.examples}</dd>
+      </dl>
+      <div style="margin-top:auto;padding-top:12px"><button class="chip" data-load="${c.smiles}">Open in lab →</button></div>
+    </article>`).join("");
+}
+
+function drawAllStructures() {
+  document.querySelectorAll(".struct[data-smiles]").forEach(d => { const s = svgFor(d.dataset.smiles, 280, 150); if (s) d.innerHTML = s; });
+}
+
+// Explorer
+let filterClass = "all";
+function renderExplorer() {
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const items = DATA.filter(d => (filterClass === "all" || d.cls === filterClass) && d.name.toLowerCase().includes(q));
+  const grid = document.getElementById("cmpGrid");
+  grid.innerHTML = items.map(d => `
+    <button class="cmp" data-load="${d.smiles}" data-name="${d.name}" style="border-top:3px solid ${classColor(d.cls)}">
+      <div class="thumb" data-smiles="${d.smiles}"><span class="ph">${d.smiles}</span></div>
+      <div class="nm">${d.name.replace(/_/g, " ")}</div>
+      <span class="pill cls" style="background:${classColor(d.cls)}">${d.cls}</span>
+    </button>`).join("") || `<p class="hint">No compounds match.</p>`;
+  if (RD) grid.querySelectorAll(".thumb[data-smiles]").forEach(t => { const s = svgFor(t.dataset.smiles, 200, 120); if (s) t.innerHTML = s; });
+}
+(function () {
+  const f = document.getElementById("classFilter");
+  f.innerHTML = ["all", ...CLASS_KEYS].map(c => `<button class="chip${c === "all" ? " on" : ""}" data-cls="${c}">${c === "all" ? `All (${DATA.length})` : c}</button>`).join("");
+  f.addEventListener("click", e => {
+    const b = e.target.closest("[data-cls]"); if (!b) return;
+    filterClass = b.dataset.cls; f.querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === b)); renderExplorer();
+  });
+  document.getElementById("search").addEventListener("input", renderExplorer);
+})();
+
+// Lab
+const EXAMPLES = [
+  ["Resveratrol", "Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1"],
+  ["Curcumin", "COc1cc(/C=C/C(=O)CC(=O)/C=C/c2ccc(O)c(OC)c2)ccc1O"],
+  ["Vanillin", "COc1cc(C=O)ccc1O"],
+  ["Nootkatone", "CC1CC(=O)C=C2CCC(CC12C)C(C)=C"],
+  ["Rutaecarpine", "O=C1c2ccccc2N=C2c3[nH]c4ccccc4c3CCN12"],
+  ["Luteolin", "O=c1cc(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12"],
+];
+(function () {
+  const c = document.getElementById("exampleChips");
+  c.innerHTML = EXAMPLES.map(([n, s]) => `<button class="chip" data-load="${s}" data-name="${n}">${n}</button>`).join("");
+})();
+
+function fmt(v, d = 2) { return typeof v === "number" ? (Number.isInteger(v) ? v : v.toFixed(d)) : "–"; }
+
+function analyse(smi, name) {
+  const status = document.getElementById("labStatus");
+  smi = (smi || "").trim();
+  if (!smi) return;
+  document.getElementById("smiles").value = smi;
+  if (!RD) { status.textContent = "RDKit is still loading. Please try again in a moment."; return; }
+  const m = getMol(smi);
+  if (!m) { status.textContent = "That SMILES string could not be parsed. Please check it and try again."; status.className = "status err"; return; }
+  status.className = "status";
+  let desc = {};
+  try { desc = JSON.parse(m.get_descriptors()); } catch (e) {}
+  const canon = m.get_smiles();
+  let svg;
+  try { svg = m.get_svg_with_highlights(JSON.stringify({ width: 460, height: 300, bondLineWidth: 1.5 })); } catch (e) { svg = m.get_svg(460, 300); }
+  m.delete();
+  document.getElementById("molView").innerHTML = svg;
+  status.innerHTML = `${name ? `<b style="text-transform:capitalize">${name.replace(/_/g, " ")}</b> · ` : ""}Canonical SMILES: <code>${canon}</code>`;
+
+  // kNN prediction
+  const q = fpBits(smi);
+  const sims = DATA.map(d => ({ ...d, sim: tanimoto(q, fpBits(d.smiles)) })).sort((a, b) => b.sim - a.sim);
+  const exact = sims[0] && sims[0].sim === 1;
+  const top = sims.slice(0, 5);
+  const score = Object.fromEntries(CLASS_KEYS.map(k => [k, 0]));
+  top.forEach(t => { score[t.cls] += t.sim + 1e-6; });
+  const tot = Object.values(score).reduce((a, b) => a + b, 0) || 1;
+  const probs = CLASS_KEYS.map(k => [k, score[k] / tot]).sort((a, b) => b[1] - a[1]);
+  const [best, p] = probs[0];
+  const maxSim = top[0]?.sim || 0;
+  const domain = maxSim >= 0.4 ? ["within the training chemistry", "var(--ok)"] : maxSim >= 0.25 ? ["moderately similar to the training set", "var(--warn)"] : ["outside the training chemistry, so treat this with caution", "var(--bad)"];
+  document.getElementById("predMain").innerHTML =
+    `<span class="big" style="color:${classColor(best)};text-transform:capitalize">${best}</span>
+     <span class="pill">${Math.round(p * 100)}% of neighbour vote</span>
+     <span class="hint" style="width:100%">Nearest similarity ${maxSim.toFixed(2)}: <span style="color:${domain[1]}">${domain[0]}</span>${exact ? " (this exact compound is in the dataset)" : ""}.</span>`;
+  document.getElementById("predBars").innerHTML = probs.map(([k, v]) =>
+    `<div class="bar"><span style="text-transform:capitalize">${k}</span><div class="track"><div class="fill" style="width:${v * 100}%;background:${classColor(k)}"></div></div><span class="v">${Math.round(v * 100)}%</span></div>`).join("");
+  document.getElementById("nnList").innerHTML = top.map(t =>
+    `<li data-load="${t.smiles}" data-name="${t.name}"><span style="text-transform:capitalize">${t.name.replace(/_/g, " ")} <span class="pill cls" style="background:${classColor(t.cls)}">${t.cls}</span></span><span class="mono">${t.sim.toFixed(2)}</span></li>`).join("");
+
+  // Descriptors
+  const mw = desc.amw, logp = desc.CrippenClogP, tpsa = desc.tpsa, hbd = desc.lipinskiHBD ?? desc.NumHBD, hba = desc.lipinskiHBA ?? desc.NumHBA;
+  const rot = desc.NumRotatableBonds, fsp3 = desc.FractionCSP3, rings = desc.NumRings, arom = desc.NumAromaticRings;
+  const stereo = desc.NumAtomStereoCenters, heavy = desc.NumHeavyAtoms, hetero = desc.NumHeteroatoms;
+  const items = [["Mol. weight", fmt(mw, 1)], ["cLogP", fmt(logp)], ["TPSA (Å²)", fmt(tpsa, 1)], ["H-bond donors", fmt(hbd)], ["H-bond acceptors", fmt(hba)],
+    ["Rotatable bonds", fmt(rot)], ["Fsp³", fmt(fsp3)], ["Rings", fmt(rings)], ["Aromatic rings", fmt(arom)], ["Stereocentres", fmt(stereo)], ["Heavy atoms", fmt(heavy)], ["Heteroatoms", fmt(hetero)]];
+  document.getElementById("descGrid").innerHTML = items.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join("");
+
+  const ro5 = [mw <= 500, logp <= 5, hbd <= 5, hba <= 10];
+  const checks = [
+    [ro5.filter(Boolean).length >= 3, `Lipinski rule of five: ${4 - ro5.filter(Boolean).length} violation(s). At most one is usually tolerated for oral drugs.`],
+    [tpsa <= 140 && rot <= 10, `Veber: TPSA ≤ 140 and ≤ 10 rotatable bonds, which suggests good oral absorption`],
+    [fsp3 >= 0.42, `Fsp³ ${fmt(fsp3)} vs about 0.42 (the rough ≥ 0.42 cut-off of Lovering et al. 2009). High Fsp³ is typical of natural products.`],
+    [stereo >= 1, `${fmt(stereo)} stereocentre(s). Natural products usually have several.`],
+  ];
+  document.getElementById("checks").innerHTML = checks.map(([ok, t]) => `<li class="${ok ? "y" : "n"}">${t}</li>`).join("");
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-load]"); if (!b) return;
+  analyse(b.dataset.load, b.dataset.name || "");
+  if (!b.closest("#lab")) document.getElementById("lab").scrollIntoView({ behavior: "smooth" });
+});
+document.getElementById("goBtn").addEventListener("click", () => analyse(document.getElementById("smiles").value));
+document.getElementById("smiles").addEventListener("keydown", e => { if (e.key === "Enter") analyse(e.target.value); });
+
+// Theme toggle
+(function () {
+  const root = document.documentElement, btn = document.getElementById("themeBtn");
+  try { const t = localStorage.getItem("np-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  btn.addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("np-theme", root.dataset.theme); } catch (e) {}
+  });
+})();
+
+// Active nav link
+(function () {
+  const links = [...document.querySelectorAll("nav.links a")];
+  const obs = new IntersectionObserver(es => es.forEach(en => {
+    if (en.isIntersecting) links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + en.target.id));
+  }), { rootMargin: "-40% 0px -55% 0px" });
+  document.querySelectorAll("main section[id]").forEach(s => obs.observe(s));
+})();
+
+renderClassCards();
+renderExplorer();
+
+// Load RDKit.js
+(function () {
+  const BASE = "https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2026.3.6/dist/";
+  const s = document.createElement("script");
+  s.src = BASE + "RDKit_minimal.js";
+  s.onload = () => window.initRDKitModule({ locateFile: () => BASE + "RDKit_minimal.wasm" }).then(mod => {
+    RD = mod;
+    document.getElementById("labStatus").textContent = `RDKit ${RD.version()} loaded. Choose an example or paste a SMILES string.`;
+    drawAllStructures(); renderExplorer();
+    analyse(EXAMPLES[0][1], EXAMPLES[0][0]);
+  }).catch(err => failRD(err));
+  s.onerror = () => failRD();
+  document.head.appendChild(s);
+  function failRD() {
+    const st = document.getElementById("labStatus");
+    st.className = "status err";
+    st.textContent = "RDKit.js could not be loaded (it needs an internet connection to cdn.jsdelivr.net). The guide still works, but structure drawing and the molecule lab do not.";
+  }
+})();
+</script>
+</body>
+</html>
