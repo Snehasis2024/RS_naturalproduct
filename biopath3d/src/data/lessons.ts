@@ -1,0 +1,151 @@
+import type { Lesson } from './schema'
+
+/** The guided journey: CELL → CELL CYCLE → DNA → GENE EXPRESSION → PROTEIN → SIGNALING → METABOLISM → DISEASE → DRUG TARGETS */
+export const JOURNEY = ['Cell', 'Cell cycle', 'DNA', 'Gene expression', 'Protein', 'Signaling', 'Metabolism', 'Disease', 'Drug targets'] as const
+
+export const LESSONS: Lesson[] = [
+  {
+    id: 'l-cell', title: 'Inside the animal cell', topic: 'cell-biology', journey: 'Cell', minutes: 8, module: 'cell',
+    hook: 'A human body has ~30 trillion cells. What does one of them need to stay alive?',
+    objectives: ['Name the major organelles and their functions', 'Relate organelle structure to function', 'Trace a secreted protein from ribosome to membrane'],
+    tags: ['mitochondria', 'nucleus', 'nucleolus', 'er', 'golgi', 'lysosomes', 'peroxisomes', 'centrosome'],
+    steps: [
+      { kind: 'explain', title: 'Compartments', text: 'Eukaryotic cells divide their chemistry into membrane-bound compartments. Each organelle maintains a distinct environment (pH, redox state, enzymes), so incompatible reactions can run at the same time.' },
+      { kind: 'scene', title: 'The nucleus', text: 'The nucleus (double membrane, nuclear pores) stores DNA. The dense nucleolus inside builds ribosomes. Rotate the cell and click the nucleus to open its panel.', scene: { type: 'cell', organelle: 'nucleus' } },
+      { kind: 'scene', title: 'Mitochondria: energy and death', text: 'Mitochondria oxidise fuels to make ATP — and decide whether the cell undergoes apoptosis by releasing cytochrome c.', scene: { type: 'cell', organelle: 'mitochondria' } },
+      { kind: 'scene', title: 'The secretory pathway', text: 'Proteins destined for secretion are made on the rough ER, then modified and sorted by the Golgi apparatus, then shipped in vesicles.', scene: { type: 'cell', organelle: 'golgi' } },
+      { kind: 'mechanism', title: 'A secreted protein’s journey', points: ['Signal peptide recognised by SRP during translation', 'Ribosome docks on Sec61 in the rough ER; protein enters the lumen', 'Folding and N-glycosylation in the ER', 'COPII vesicles carry it to the cis-Golgi', 'Glycan processing through the Golgi stack', 'Secretory vesicle fuses with the plasma membrane (exocytosis)'] },
+      { kind: 'scene', title: 'Explode the cell', text: 'Explode-view separates the organelles so you can see each one. Try the Explorer’s isolate mode afterwards.', scene: { type: 'cell', explode: true } },
+      { kind: 'question', questionId: 'q-lyso-1' },
+      { kind: 'question', questionId: 'q-id-mito' },
+    ],
+  },
+  {
+    id: 'l-cellcycle', title: 'The cell cycle', topic: 'molecular-biology', journey: 'Cell cycle', minutes: 10, module: 'cellcycle',
+    hook: 'Your gut lining replaces itself every few days. How does a cell copy itself without losing a single chromosome?',
+    objectives: ['Describe events of G1, S, G2 and M', 'Explain sister-chromatid cohesion and its release', 'Recognise the phases of mitosis'],
+    tags: ['cell-cycle', 'cohesin', 'apcc', 'separase', 'cyclinB', 'cdk1'],
+    steps: [
+      { kind: 'explain', title: 'Interphase and M phase', text: 'A typical proliferating human cell spends ~23 of 24 hours in interphase (G1, S, G2) and about an hour in mitosis. Interphase is not rest: the cell grows and copies its DNA.' },
+      { kind: 'scene', title: 'S phase: replication', text: 'Each chromosome is replicated into two sister chromatids, held together by cohesin rings. The centrosome also duplicates.', scene: { type: 'cellcycle', phase: 'S' } },
+      { kind: 'scene', title: 'Prophase: condensation', text: 'Cyclin B–CDK1 triggers condensin-driven compaction; chromosomes become visible as X shapes. Centrosomes move apart.', scene: { type: 'cellcycle', phase: 'prophase' } },
+      { kind: 'scene', title: 'Metaphase: alignment', text: 'Every chromosome is bi-oriented at the metaphase plate. The spindle-assembly checkpoint waits until the last kinetochore is attached.', scene: { type: 'cellcycle', phase: 'metaphase' } },
+      { kind: 'scene', title: 'Anaphase: separation', text: 'APC/C degrades securin, separase cuts cohesin and chromatids are pulled to opposite poles.', scene: { type: 'cellcycle', phase: 'anaphase' } },
+      { kind: 'scene', title: 'Cytokinesis', text: 'An actin–myosin ring pinches the cell into two daughters, each with a complete genome.', scene: { type: 'cellcycle', phase: 'cytokinesis' } },
+      { kind: 'question', questionId: 'q-cc-s' },
+      { kind: 'question', questionId: 'q-cc-order' },
+      { kind: 'question', questionId: 'q-cc-anaphase' },
+    ],
+  },
+  {
+    id: 'l-checkpoint', title: 'Why does a damaged cell stop dividing?', topic: 'molecular-biology', journey: 'Cell cycle', minutes: 8, module: 'regulation',
+    hook: 'Why does the cell stop dividing when DNA is damaged?',
+    objectives: ['Trace the ATM/ATR → p53 → p21 → CDK axis', 'Explain how CDK inhibition blocks S-phase entry', 'Explain the arrest-vs-apoptosis decision'],
+    tags: ['dna-damage', 'p53', 'p21', 'atm', 'atr', 'mdm2', 'rb'],
+    steps: [
+      { kind: 'explain', title: 'The problem', text: 'Replicating or segregating damaged DNA would copy mutations into both daughters. Checkpoints detect damage and pause the cycle so repair can happen first.' },
+      { kind: 'scene', title: 'Sensors', text: 'Double-strand breaks activate ATM; single-stranded DNA at stalled forks activates ATR.', scene: { type: 'pathway', pathway: 'dna-damage', step: 0 } },
+      { kind: 'scene', title: 'p53 is stabilised', text: 'Phosphorylation by ATM and CHK2 blocks MDM2 binding, so p53 accumulates instead of being degraded.', scene: { type: 'pathway', pathway: 'dna-damage', step: 2 } },
+      { kind: 'scene', title: 'p21 blocks CDKs', text: 'p53 induces p21, a CDK inhibitor. Without CDK2 activity, RB stays bound to E2F and S-phase genes stay off.', scene: { type: 'pathway', pathway: 'dna-damage', step: 3 } },
+      { kind: 'mechanism', title: 'The full chain', points: ['DNA damage', '→ ATM/ATR activation', '→ p53 phosphorylation & stabilisation', '→ p21 (CDKN1A) transcription', '→ cyclin E/A–CDK2 inhibition', '→ RB remains hypophosphorylated, E2F repressed', '→ G1 arrest (repair) — or apoptosis if damage is irreparable'] },
+      { kind: 'question', questionId: 'q-dd-p53' },
+      { kind: 'question', questionId: 'q-dd-order' },
+    ],
+  },
+  {
+    id: 'l-dna', title: 'DNA structure and replication', topic: 'molecular-biology', journey: 'DNA', minutes: 7, module: 'dogma',
+    objectives: ['Describe B-DNA geometry and base pairing', 'Explain leading vs lagging strand synthesis'],
+    tags: ['replication', 'dna'],
+    steps: [
+      { kind: 'scene', title: 'The double helix', text: 'Antiparallel strands, sugar-phosphate backbones outside, bases stacked inside. A–T share two hydrogen bonds; G–C share three.', scene: { type: 'dogma', stage: 'dna' } },
+      { kind: 'scene', title: 'Zoom to a nucleotide', text: 'A nucleotide = phosphate + deoxyribose + base. Rotate this computed 3D model of dAMP.', scene: { type: 'molecule', id: 'damp' } },
+      { kind: 'scene', title: 'The replication fork', text: 'Polymerases only extend 5′→3′, so one strand is made continuously and the other in Okazaki fragments.', scene: { type: 'dogma', stage: 'replication' } },
+      { kind: 'question', questionId: 'q-cc-s' },
+    ],
+  },
+  {
+    id: 'l-expression', title: 'Gene expression: transcription & processing', topic: 'molecular-biology', journey: 'Gene expression', minutes: 8, module: 'dogma',
+    objectives: ['Explain template vs coding strand', 'Describe capping, splicing and polyadenylation'],
+    tags: ['transcription', 'processing', 'rnapol2'],
+    steps: [
+      { kind: 'scene', title: 'Transcription', text: 'RNA polymerase II reads the template strand and builds RNA 5′→3′. The RNA matches the coding strand (U for T).', scene: { type: 'dogma', stage: 'transcription' } },
+      { kind: 'scene', title: 'RNA processing', text: 'The intron (GU…AG) is spliced out, a 5′ cap and poly(A) tail are added.', scene: { type: 'dogma', stage: 'processing' } },
+      { kind: 'question', questionId: 'q-dogma-rna' },
+      { kind: 'question', questionId: 'q-dogma-splice' },
+    ],
+  },
+  {
+    id: 'l-protein', title: 'Translation and protein structure', topic: 'molecular-biology', journey: 'Protein', minutes: 8, module: 'dogma',
+    objectives: ['Read codons with the genetic code', 'Describe ribosome A/P/E sites', 'Relate structure to function using a real PDB structure'],
+    tags: ['translation', 'folding', 'ribosomes'],
+    steps: [
+      { kind: 'scene', title: 'Translation', text: 'Watch codons being read: each tRNA anticodon pairs with an mRNA codon and delivers one amino acid.', scene: { type: 'dogma', stage: 'translation' } },
+      { kind: 'scene', title: 'Folding', text: 'A visual metaphor of hydrophobic collapse and secondary-structure formation (hypothetical visualisation).', scene: { type: 'dogma', stage: 'folding' } },
+      { kind: 'scene', title: 'A real structure: p53 on DNA', text: 'An X-ray structure of the p53 DNA-binding domain. Cancer hotspot residues are highlighted.', scene: { type: 'molecule', id: '1TUP' } },
+      { kind: 'question', questionId: 'q-dogma-code' },
+      { kind: 'question', questionId: 'q-dogma-ribo' },
+    ],
+  },
+  {
+    id: 'l-signaling', title: 'Growth-factor signalling', topic: 'signaling', journey: 'Signaling', minutes: 10, module: 'signaling',
+    hook: 'How does a molecule outside the cell tell the nucleus to divide?',
+    objectives: ['Trace EGFR → RAS → ERK', 'Explain PI3K–AKT–mTOR and double-negative logic', 'Link signalling to the cell cycle'],
+    tags: ['egfr-mapk', 'pi3k-akt-mtor', 'egfr', 'ras', 'akt', 'mtor'],
+    steps: [
+      { kind: 'scene', title: 'Receptor activation', text: 'EGF binding causes EGFR dimerisation and trans-autophosphorylation.', scene: { type: 'pathway', pathway: 'egfr-mapk', step: 1 } },
+      { kind: 'scene', title: 'The RAS switch', text: 'GRB2–SOS load GTP onto RAS.', scene: { type: 'pathway', pathway: 'egfr-mapk', step: 2 } },
+      { kind: 'scene', title: 'The kinase relay', text: 'RAF → MEK → ERK: each kinase phosphorylates and activates the next.', scene: { type: 'pathway', pathway: 'egfr-mapk', step: 3 } },
+      { kind: 'scene', title: 'Growth via mTORC1', text: 'The parallel PI3K–AKT arm activates mTORC1 by inhibiting its inhibitor, TSC2.', scene: { type: 'pathway', pathway: 'pi3k-akt-mtor', step: 2 } },
+      { kind: 'question', questionId: 'q-egfr-ras' },
+      { kind: 'question', questionId: 'q-akt-mtor' },
+      { kind: 'question', questionId: 'q-mapk-order' },
+    ],
+  },
+  {
+    id: 'l-metabolism', title: 'Glycolysis and cellular energy', topic: 'metabolism', journey: 'Metabolism', minutes: 10, module: 'metabolism',
+    objectives: ['List glycolytic intermediates in order', 'Account for ATP and NADH', 'Connect glycolysis to the TCA cycle and OXPHOS'],
+    tags: ['glycolysis', 'tca', 'oxphos', 'pfk1'],
+    steps: [
+      { kind: 'scene', title: 'Investment phase', text: 'Hexokinase and PFK-1 each spend one ATP. Watch the ATP ledger go negative.', scene: { type: 'metabolic', pathway: 'glycolysis', step: 2 } },
+      { kind: 'scene', title: 'Payoff phase', text: 'After aldolase every step runs twice. GAPDH makes NADH; PGK and pyruvate kinase make ATP.', scene: { type: 'metabolic', pathway: 'glycolysis', step: 9 } },
+      { kind: 'scene', title: 'Into the mitochondrion', text: 'Pyruvate becomes acetyl-CoA and is oxidised in the TCA cycle, generating NADH and FADH₂ for oxidative phosphorylation.', scene: { type: 'metabolic', pathway: 'tca' } },
+      { kind: 'question', questionId: 'q-gly-atp' },
+      { kind: 'question', questionId: 'q-gly-order' },
+      { kind: 'question', questionId: 'q-tca-yield' },
+    ],
+  },
+  {
+    id: 'l-apoptosis', title: 'Apoptosis: programmed cell death', topic: 'pathways', journey: 'Disease', minutes: 8, module: 'apoptosis',
+    objectives: ['Compare intrinsic and extrinsic apoptosis', 'Explain the role of BCL-2 and cytochrome c'],
+    tags: ['apoptosis-intrinsic', 'apoptosis-extrinsic', 'bcl2', 'cytc', 'casp3'],
+    steps: [
+      { kind: 'scene', title: 'Intrinsic pathway', text: 'BAX/BAK permeabilise mitochondria; cytochrome c builds the apoptosome.', scene: { type: 'pathway', pathway: 'apoptosis-intrinsic', step: 2 } },
+      { kind: 'scene', title: 'Extrinsic pathway', text: 'Death receptors assemble the DISC to activate caspase-8.', scene: { type: 'pathway', pathway: 'apoptosis-extrinsic', step: 2 } },
+      { kind: 'question', questionId: 'q-apo-intr' },
+      { kind: 'question', questionId: 'q-apo-necrosis' },
+    ],
+  },
+  {
+    id: 'l-disease', title: 'Cancer as broken pathways', topic: 'pathways', journey: 'Disease', minutes: 8, module: 'map',
+    hook: 'Cancer is not one disease — but many cancers break the same few pathways.',
+    objectives: ['Classify oncogenes vs tumour suppressors', 'Map common mutations to pathway nodes'],
+    tags: ['ras', 'p53', 'rb', 'pten', 'global-map'],
+    steps: [
+      { kind: 'explain', title: 'Accelerators and brakes', text: 'Oncogenes are hyperactive accelerators (gain of function, usually one allele): EGFR, KRAS, BRAF, PIK3CA, MYC, cyclin D1. Tumour suppressors are brakes lost by two hits: TP53, RB1, PTEN, APC, CDKN2A.', evidence: 'established' },
+      { kind: 'scene', title: 'Where the mutations sit', text: 'On the connection map, growth signals (MAPK, PI3K) converge on the cell cycle, while p53 and apoptosis act as brakes. Cancers typically activate one arm and disable another.', scene: { type: 'pathway', pathway: 'global-map' } },
+      { kind: 'question', questionId: 'q-ras-mut' },
+      { kind: 'question', questionId: 'q-map-p53' },
+    ],
+  },
+  {
+    id: 'l-drugs', title: 'Drug targets', topic: 'signaling', journey: 'Drug targets', minutes: 8, module: 'molecules',
+    objectives: ['Connect approved targeted drugs to their pathway nodes', 'Explore an inhibitor bound in a real crystal structure'],
+    tags: ['egfr', 'cdk46', 'bcl2', 'ras'],
+    steps: [
+      { kind: 'scene', title: 'EGFR inhibitor in its pocket', text: 'Erlotinib (ligand AQ4) bound in the ATP site of the EGFR kinase domain. The hinge methionine and gatekeeper threonine are highlighted.', scene: { type: 'molecule', id: '1M17' } },
+      { kind: 'scene', title: 'KRAS G12C', text: 'Sotorasib covalently attached to Cys12 in the switch-II pocket, trapping KRAS in the GDP state.', scene: { type: 'molecule', id: '6OIM' } },
+      { kind: 'mechanism', title: 'Targeted therapies by pathway', points: ['EGFR (lung cancer): erlotinib, gefitinib, osimertinib', 'KRAS G12C: sotorasib, adagrasib', 'BRAF V600E (melanoma): vemurafenib, dabrafenib + MEK inhibitor trametinib', 'CDK4/6 (HR+ breast cancer): palbociclib, ribociclib, abemaciclib', 'mTORC1: everolimus', 'BCL-2 (CLL, AML): venetoclax'], evidence: 'established' },
+      { kind: 'question', questionId: 'q-match-drugs' },
+    ],
+  },
+]

@@ -1,0 +1,55 @@
+{
+  "id": "dna-damage",
+  "name": "DNA damage response → cell-cycle arrest",
+  "category": "regulation",
+  "topic": "molecular-biology",
+  "summary": "DNA damage activates the sensor kinases ATM (double-strand breaks) and ATR (single-stranded DNA / replication stress). They activate CHK2/CHK1 and stabilise p53. p53 induces p21, which inhibits CDKs so RB stays active and the cell arrests in G1; CHK1/2 also inhibit CDC25, blocking CDK activation. If damage is irreparable, p53 induces apoptosis.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "Checkpoint loss (TP53, ATM mutation) lets cells with damaged DNA keep dividing — a hallmark of cancer. PARP, ATR and WEE1 inhibitors exploit DNA-repair defects in tumours.",
+  "outcomes": ["Cell-cycle arrest & repair", "Senescence", "Apoptosis"],
+  "references": [
+    {"label": "KEGG hsa04115 (p53 signaling)", "url": "https://www.kegg.jp/pathway/hsa04115"},
+    {"label": "KEGG hsa04110 (Cell cycle)", "url": "https://www.kegg.jp/pathway/hsa04110"},
+    {"label": "Jackson & Bartek (2009) Nature 461:1071 — The DNA-damage response", "url": "https://doi.org/10.1038/nature08467"}
+  ],
+  "nodes": [
+    {"id": "damage", "label": "DNA damage", "type": "stimulus", "compartment": "nucleus", "description": "Double-strand breaks (ionising radiation) or stalled forks (UV, replication stress)."},
+    {"id": "atm", "label": "ATM", "type": "kinase", "ref": "atm", "compartment": "nucleus"},
+    {"id": "atr", "label": "ATR", "type": "kinase", "ref": "atr", "compartment": "nucleus"},
+    {"id": "chk2", "label": "CHK2", "type": "kinase", "ref": "chk2", "compartment": "nucleus"},
+    {"id": "chk1", "label": "CHK1", "type": "kinase", "ref": "chk1", "compartment": "nucleus"},
+    {"id": "mdm2", "label": "MDM2", "type": "inhibitor", "ref": "mdm2", "compartment": "nucleus"},
+    {"id": "p53", "label": "p53", "type": "transcription-factor", "ref": "p53", "compartment": "nucleus"},
+    {"id": "cdc25", "label": "CDC25", "type": "phosphatase", "ref": "cdc25", "compartment": "nucleus"},
+    {"id": "p21", "label": "p21", "type": "inhibitor", "ref": "p21", "compartment": "nucleus"},
+    {"id": "cdk", "label": "Cyclin E/A–CDK2, Cyclin B–CDK1", "type": "kinase", "ref": "cdk2", "compartment": "nucleus"},
+    {"id": "arrest", "label": "Cell-cycle arrest (G1/S, G2/M)", "type": "outcome", "compartment": "outcome"},
+    {"id": "puma", "label": "PUMA / NOXA / BAX", "type": "gene", "ref": "bh3", "compartment": "nucleus"},
+    {"id": "apoptosis", "label": "Apoptosis", "type": "outcome", "compartment": "outcome", "link": "apoptosis-intrinsic"}
+  ],
+  "edges": [
+    {"from": "damage", "to": "atm", "type": "activation", "label": "DSB (MRN complex)"},
+    {"from": "damage", "to": "atr", "type": "activation", "label": "RPA-ssDNA (ATRIP)"},
+    {"from": "atm", "to": "chk2", "type": "phosphorylation"},
+    {"from": "atr", "to": "chk1", "type": "phosphorylation"},
+    {"from": "atm", "to": "p53", "type": "phosphorylation", "label": "Ser15"},
+    {"from": "chk2", "to": "p53", "type": "phosphorylation", "label": "Ser20"},
+    {"from": "mdm2", "to": "p53", "type": "inhibition", "label": "ubiquitination (blocked)"},
+    {"from": "chk1", "to": "cdc25", "type": "inhibition"},
+    {"from": "chk2", "to": "cdc25", "type": "inhibition"},
+    {"from": "p53", "to": "p21", "type": "transcription"},
+    {"from": "p21", "to": "cdk", "type": "inhibition"},
+    {"from": "cdc25", "to": "cdk", "type": "activation", "label": "removes inhibitory P"},
+    {"from": "cdk", "to": "arrest", "type": "inhibition", "description": "CDK activity is required for progression; inhibiting CDKs causes arrest."},
+    {"from": "p53", "to": "puma", "type": "transcription", "label": "severe damage"},
+    {"from": "puma", "to": "apoptosis", "type": "activation"}
+  ],
+  "steps": [
+    {"title": "1 · Damage is detected", "text": "Double-strand breaks recruit the MRN complex, which activates ATM. Single-stranded DNA coated with RPA recruits ATR–ATRIP.", "nodes": ["damage", "atm", "atr"], "edges": [["damage", "atm"], ["damage", "atr"]]},
+    {"title": "2 · Checkpoint kinases", "text": "ATM phosphorylates CHK2; ATR phosphorylates CHK1. These spread the signal through the nucleus.", "nodes": ["atm", "atr", "chk1", "chk2"], "edges": [["atm", "chk2"], ["atr", "chk1"]]},
+    {"title": "3 · p53 is stabilised", "text": "ATM and CHK2 phosphorylate p53 near its MDM2-binding site (Ser15, Ser20). MDM2 can no longer tag p53 for degradation, so p53 accumulates.", "nodes": ["atm", "chk2", "p53", "mdm2"], "edges": [["atm", "p53"], ["chk2", "p53"], ["mdm2", "p53"]]},
+    {"title": "4 · p21 blocks CDKs", "text": "p53 activates the CDKN1A gene. p21 protein binds and inhibits cyclin–CDK2 complexes. Meanwhile CHK1/2 inactivate CDC25, so CDKs keep their inhibitory phosphates.", "nodes": ["p53", "p21", "cdk", "cdc25", "chk1", "chk2"], "edges": [["p53", "p21"], ["p21", "cdk"], ["chk1", "cdc25"], ["chk2", "cdc25"], ["cdc25", "cdk"]]},
+    {"title": "5 · Arrest — or death", "text": "Without CDK activity RB stays bound to E2F and the cell cannot enter S phase (or mitosis) until repair is complete. If damage is irreparable, sustained p53 induces PUMA, NOXA and BAX, triggering apoptosis.", "nodes": ["cdk", "arrest", "p53", "puma", "apoptosis"], "edges": [["cdk", "arrest"], ["p53", "puma"], ["puma", "apoptosis"]]}
+  ]
+}

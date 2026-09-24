@@ -1,0 +1,39 @@
+{
+  "id": "nfkb",
+  "name": "NF-κB (canonical)",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "Inflammatory signals activate the IKK complex, which phosphorylates IκBα for degradation, releasing NF-κB to enter the nucleus and switch on inflammatory and survival genes. IκBα re-synthesis provides negative feedback.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "Chronic NF-κB activity drives inflammatory disease and some lymphomas. Anti-TNF biologics block upstream activation; proteasome inhibitors (bortezomib) partly act by preventing IκB degradation.",
+  "outcomes": ["Inflammation", "Immune activation", "Survival"],
+  "references": [
+    {"label": "KEGG hsa04064 (NF-kappa B signaling)", "url": "https://www.kegg.jp/pathway/hsa04064"},
+    {"label": "Hayden & Ghosh (2008) Cell 132:344 — Shared principles in NF-κB signaling", "url": "https://doi.org/10.1016/j.cell.2008.01.020"}
+  ],
+  "nodes": [
+    {"id": "tnf", "label": "TNF-α", "type": "ligand", "ref": "tnf", "compartment": "extracellular"},
+    {"id": "tnfr", "label": "TNFR1 complex I", "type": "receptor", "ref": "tnfr", "compartment": "membrane"},
+    {"id": "tak1", "label": "TAK1", "type": "kinase", "compartment": "cytoplasm", "description": "MAP3K activated by ubiquitin chains; phosphorylates IKKβ."},
+    {"id": "ikk", "label": "IKK complex", "type": "kinase", "ref": "ikk", "compartment": "cytoplasm"},
+    {"id": "ikb", "label": "IκBα–NF-κB", "type": "complex", "ref": "ikb", "compartment": "cytoplasm"},
+    {"id": "deg", "label": "IκBα degradation", "type": "process", "ref": "ubiquitin", "compartment": "cytoplasm"},
+    {"id": "nfkb", "label": "NF-κB (p65/p50)", "type": "transcription-factor", "ref": "nfkb", "compartment": "cytoplasm"},
+    {"id": "nfkbn", "label": "NF-κB (nuclear)", "type": "transcription-factor", "ref": "nfkb", "compartment": "nucleus"},
+    {"id": "targets", "label": "IL-6, TNF, IκBα, cIAPs, BCL-XL", "type": "gene", "compartment": "nucleus"},
+    {"id": "out", "label": "Inflammation & survival", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "tnf", "to": "tnfr", "type": "binding"},
+    {"from": "tnfr", "to": "tak1", "type": "activation", "label": "K63/M1 ubiquitin scaffolds"},
+    {"from": "tak1", "to": "ikk", "type": "phosphorylation"},
+    {"from": "ikk", "to": "ikb", "type": "phosphorylation", "label": "IκBα Ser32/36"},
+    {"from": "ikb", "to": "deg", "type": "degradation", "label": "K48 ubiquitin → proteasome"},
+    {"from": "ikb", "to": "nfkb", "type": "release"},
+    {"from": "nfkb", "to": "nfkbn", "type": "translocation"},
+    {"from": "nfkbn", "to": "targets", "type": "transcription"},
+    {"from": "targets", "to": "out", "type": "activation"},
+    {"from": "targets", "to": "ikb", "type": "inhibition", "label": "new IκBα (feedback)"}
+  ]
+}

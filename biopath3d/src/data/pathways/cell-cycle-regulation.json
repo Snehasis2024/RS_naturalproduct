@@ -1,0 +1,476 @@
+{
+  "id": "cell-cycle-regulation",
+  "name": "Cell-cycle regulation: cyclin–CDK network",
+  "category": "regulation",
+  "topic": "molecular-biology",
+  "summary": "Sequential waves of cyclin–CDK activity drive the cell through G1, S, G2 and M. Mitogens induce cyclin D; cyclin D–CDK4/6 and cyclin E–CDK2 phosphorylate RB to release E2F; cyclin A–CDK2 runs S phase; cyclin B–CDK1 triggers mitosis; APC/C destroys cyclin B to exit mitosis.",
+  "evidence": "established",
+  "layout": "manual",
+  "clinical": "CDK4/6 inhibitors (palbociclib, ribociclib, abemaciclib) treat HR+/HER2− breast cancer and require functional RB. p16 (CDKN2A) loss and cyclin D1 amplification are common in cancer.",
+  "outcomes": [
+    "Orderly progression through G1 → S → G2 → M"
+  ],
+  "references": [
+    {
+      "label": "KEGG hsa04110 (Cell cycle)",
+      "url": "https://www.kegg.jp/pathway/hsa04110"
+    },
+    {
+      "label": "Matthews, Bertoli & de Bruin (2022) Nat Rev Mol Cell Biol 23:74 — Cell cycle control in cancer",
+      "url": "https://doi.org/10.1038/s41580-021-00404-3"
+    },
+    {
+      "label": "Alberts et al., MBoC 4th ed., ch. 17 The Cell Cycle (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK21054/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mitogen",
+      "label": "Mitogens (RAS–ERK)",
+      "type": "stimulus",
+      "compartment": "cytoplasm",
+      "pos": [
+        -7,
+        4,
+        0
+      ],
+      "link": "egfr-mapk"
+    },
+    {
+      "id": "cycd",
+      "label": "Cyclin D–CDK4/6",
+      "type": "complex",
+      "ref": "cdk46",
+      "pos": [
+        -5,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "p16",
+      "label": "p16INK4a",
+      "type": "inhibitor",
+      "ref": "p16",
+      "pos": [
+        -7,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "rb",
+      "label": "RB",
+      "type": "protein",
+      "ref": "rb",
+      "pos": [
+        -3,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "e2f",
+      "label": "E2F",
+      "type": "transcription-factor",
+      "ref": "e2f",
+      "pos": [
+        -1,
+        -2,
+        0
+      ]
+    },
+    {
+      "id": "cyce",
+      "label": "Cyclin E–CDK2",
+      "type": "complex",
+      "ref": "cyclinE",
+      "pos": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "cyca",
+      "label": "Cyclin A–CDK2",
+      "type": "complex",
+      "ref": "cyclinA",
+      "pos": [
+        3,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "cycb",
+      "label": "Cyclin B–CDK1",
+      "type": "complex",
+      "ref": "cdk1",
+      "pos": [
+        5.5,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "wee1",
+      "label": "WEE1",
+      "type": "kinase",
+      "ref": "wee1",
+      "pos": [
+        7,
+        2.5,
+        0.5
+      ]
+    },
+    {
+      "id": "cdc25",
+      "label": "CDC25",
+      "type": "phosphatase",
+      "ref": "cdc25",
+      "pos": [
+        7.5,
+        -1.8,
+        0.5
+      ]
+    },
+    {
+      "id": "apc",
+      "label": "APC/C–Cdc20",
+      "type": "complex",
+      "ref": "apcc",
+      "pos": [
+        4,
+        -3.2,
+        0
+      ]
+    },
+    {
+      "id": "p21",
+      "label": "p21",
+      "type": "inhibitor",
+      "ref": "p21",
+      "pos": [
+        0,
+        3.5,
+        0.5
+      ],
+      "link": "dna-damage"
+    },
+    {
+      "id": "p53",
+      "label": "p53",
+      "type": "transcription-factor",
+      "ref": "p53",
+      "pos": [
+        -2,
+        5,
+        0
+      ],
+      "link": "dna-damage"
+    },
+    {
+      "id": "g1s",
+      "label": "G1 → S (restriction point)",
+      "type": "outcome",
+      "pos": [
+        -0.5,
+        -4.5,
+        0
+      ]
+    },
+    {
+      "id": "s",
+      "label": "DNA replication (S)",
+      "type": "outcome",
+      "pos": [
+        2.2,
+        -5.2,
+        0
+      ]
+    },
+    {
+      "id": "m",
+      "label": "Mitosis (M)",
+      "type": "outcome",
+      "pos": [
+        7,
+        -4.5,
+        0
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "mitogen",
+      "to": "cycd",
+      "type": "transcription",
+      "label": "induces cyclin D"
+    },
+    {
+      "from": "p16",
+      "to": "cycd",
+      "type": "inhibition"
+    },
+    {
+      "from": "cycd",
+      "to": "rb",
+      "type": "phosphorylation",
+      "label": "initial phosphorylation"
+    },
+    {
+      "from": "cyce",
+      "to": "rb",
+      "type": "phosphorylation",
+      "label": "hyperphosphorylation"
+    },
+    {
+      "from": "rb",
+      "to": "e2f",
+      "type": "inhibition",
+      "label": "hypophosphorylated RB binds E2F"
+    },
+    {
+      "from": "e2f",
+      "to": "cyce",
+      "type": "transcription",
+      "label": "positive feedback"
+    },
+    {
+      "from": "e2f",
+      "to": "g1s",
+      "type": "activation"
+    },
+    {
+      "from": "cyce",
+      "to": "g1s",
+      "type": "activation"
+    },
+    {
+      "from": "e2f",
+      "to": "cyca",
+      "type": "transcription"
+    },
+    {
+      "from": "cyca",
+      "to": "s",
+      "type": "activation"
+    },
+    {
+      "from": "cyca",
+      "to": "cycb",
+      "type": "activation",
+      "evidence": "simplified",
+      "label": "promotes G2/M"
+    },
+    {
+      "from": "wee1",
+      "to": "cycb",
+      "type": "inhibition",
+      "label": "pTyr15"
+    },
+    {
+      "from": "cdc25",
+      "to": "cycb",
+      "type": "activation",
+      "label": "removes pTyr15"
+    },
+    {
+      "from": "cycb",
+      "to": "cdc25",
+      "type": "phosphorylation",
+      "label": "positive feedback"
+    },
+    {
+      "from": "cycb",
+      "to": "m",
+      "type": "activation"
+    },
+    {
+      "from": "cycb",
+      "to": "apc",
+      "type": "activation",
+      "label": "activates (delayed)"
+    },
+    {
+      "from": "apc",
+      "to": "cycb",
+      "type": "degradation",
+      "label": "cyclin B destruction → mitotic exit"
+    },
+    {
+      "from": "p53",
+      "to": "p21",
+      "type": "transcription"
+    },
+    {
+      "from": "p21",
+      "to": "cyce",
+      "type": "inhibition"
+    },
+    {
+      "from": "p21",
+      "to": "cyca",
+      "type": "inhibition"
+    }
+  ],
+  "steps": [
+    {
+      "title": "1 · Mitogens → cyclin D",
+      "text": "Growth-factor signalling (RAS–ERK, PI3K) induces cyclin D, which binds CDK4/6. INK4 proteins such as p16 block this complex.",
+      "nodes": [
+        "mitogen",
+        "cycd",
+        "p16"
+      ],
+      "edges": [
+        [
+          "mitogen",
+          "cycd"
+        ],
+        [
+          "p16",
+          "cycd"
+        ]
+      ]
+    },
+    {
+      "title": "2 · RB phosphorylation releases E2F",
+      "text": "Cyclin D–CDK4/6 begins phosphorylating RB. Partially phosphorylated RB still restrains E2F.",
+      "nodes": [
+        "cycd",
+        "rb",
+        "e2f"
+      ],
+      "edges": [
+        [
+          "cycd",
+          "rb"
+        ],
+        [
+          "rb",
+          "e2f"
+        ]
+      ]
+    },
+    {
+      "title": "3 · The restriction-point switch",
+      "text": "E2F induces cyclin E; cyclin E–CDK2 hyperphosphorylates RB, freeing more E2F — a positive-feedback loop that makes G1→S commitment switch-like and mitogen-independent.",
+      "nodes": [
+        "e2f",
+        "cyce",
+        "rb",
+        "g1s"
+      ],
+      "edges": [
+        [
+          "e2f",
+          "cyce"
+        ],
+        [
+          "cyce",
+          "rb"
+        ],
+        [
+          "e2f",
+          "g1s"
+        ],
+        [
+          "cyce",
+          "g1s"
+        ]
+      ]
+    },
+    {
+      "title": "4 · S phase",
+      "text": "Cyclin A–CDK2 promotes DNA replication and prevents re-licensing of origins.",
+      "nodes": [
+        "e2f",
+        "cyca",
+        "s"
+      ],
+      "edges": [
+        [
+          "e2f",
+          "cyca"
+        ],
+        [
+          "cyca",
+          "s"
+        ]
+      ]
+    },
+    {
+      "title": "5 · G2/M switch",
+      "text": "Cyclin B–CDK1 accumulates but is held inactive by WEE1 phosphorylation. CDC25 removes this phosphate; active CDK1 activates more CDC25 (positive feedback), producing an abrupt entry into mitosis.",
+      "nodes": [
+        "cycb",
+        "wee1",
+        "cdc25",
+        "m"
+      ],
+      "edges": [
+        [
+          "wee1",
+          "cycb"
+        ],
+        [
+          "cdc25",
+          "cycb"
+        ],
+        [
+          "cycb",
+          "cdc25"
+        ],
+        [
+          "cycb",
+          "m"
+        ]
+      ]
+    },
+    {
+      "title": "6 · Mitotic exit",
+      "text": "Once the spindle checkpoint is satisfied, APC/C–Cdc20 ubiquitinates cyclin B and securin. Cyclin B destruction inactivates CDK1, allowing mitotic exit.",
+      "nodes": [
+        "cycb",
+        "apc"
+      ],
+      "edges": [
+        [
+          "cycb",
+          "apc"
+        ],
+        [
+          "apc",
+          "cycb"
+        ]
+      ]
+    },
+    {
+      "title": "7 · Brakes from p53",
+      "text": "DNA damage activates p53, which induces p21; p21 inhibits CDK2 complexes, preventing RB phosphorylation and holding the cell in G1.",
+      "nodes": [
+        "p53",
+        "p21",
+        "cyce",
+        "cyca"
+      ],
+      "edges": [
+        [
+          "p53",
+          "p21"
+        ],
+        [
+          "p21",
+          "cyce"
+        ],
+        [
+          "p21",
+          "cyca"
+        ]
+      ]
+    }
+  ]
+}

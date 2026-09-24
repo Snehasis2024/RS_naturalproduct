@@ -1,0 +1,37 @@
+{
+  "id": "jak-stat",
+  "name": "JAK–STAT",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "Cytokine receptors lack kinase domains; they use associated Janus kinases (JAKs) to phosphorylate STAT transcription factors, which dimerise and enter the nucleus.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "JAK2 V617F in myeloproliferative neoplasms; JAK inhibitors (ruxolitinib, tofacitinib, baricitinib) in myelofibrosis and autoimmune disease.",
+  "outcomes": ["Immune responses", "Haematopoiesis", "Proliferation/survival"],
+  "references": [
+    {"label": "KEGG hsa04630 (JAK-STAT signaling)", "url": "https://www.kegg.jp/pathway/hsa04630"},
+    {"label": "Reactome: Interleukin-6 signaling", "url": "https://reactome.org/content/query?q=Interleukin-6%20signaling&species=Homo+sapiens"}
+  ],
+  "nodes": [
+    {"id": "il6", "label": "IL-6", "type": "ligand", "ref": "il6", "compartment": "extracellular"},
+    {"id": "rec", "label": "IL-6R / gp130", "type": "receptor", "ref": "cytokineReceptor", "compartment": "membrane"},
+    {"id": "jak", "label": "JAK1/2", "type": "kinase", "ref": "jak", "compartment": "cytoplasm"},
+    {"id": "stat", "label": "STAT3", "type": "transcription-factor", "ref": "stat", "compartment": "cytoplasm"},
+    {"id": "dimer", "label": "pSTAT3 dimer", "type": "transcription-factor", "ref": "stat", "compartment": "cytoplasm"},
+    {"id": "statn", "label": "STAT3 (nuclear)", "type": "transcription-factor", "ref": "stat", "compartment": "nucleus"},
+    {"id": "targets", "label": "Target genes (SOCS3, BCL-XL, MYC)", "type": "gene", "compartment": "nucleus"},
+    {"id": "socs", "label": "SOCS3", "type": "inhibitor", "ref": "socs", "compartment": "cytoplasm"},
+    {"id": "out", "label": "Inflammation / proliferation", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "il6", "to": "rec", "type": "binding"},
+    {"from": "rec", "to": "jak", "type": "activation", "label": "trans-phosphorylation"},
+    {"from": "jak", "to": "stat", "type": "phosphorylation", "label": "Tyr705"},
+    {"from": "stat", "to": "dimer", "type": "binding", "label": "SH2–pTyr dimer"},
+    {"from": "dimer", "to": "statn", "type": "translocation"},
+    {"from": "statn", "to": "targets", "type": "transcription"},
+    {"from": "targets", "to": "out", "type": "activation"},
+    {"from": "targets", "to": "socs", "type": "activation", "label": "induces"},
+    {"from": "socs", "to": "jak", "type": "inhibition", "label": "negative feedback"}
+  ]
+}

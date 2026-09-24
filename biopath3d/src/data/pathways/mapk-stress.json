@@ -1,0 +1,38 @@
+{
+  "id": "mapk-stress",
+  "name": "Stress MAPK (JNK & p38)",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "Parallel MAPK modules respond to cellular stress and inflammatory cytokines. Each uses the same three-tier logic as ERK: MAP3K → MAP2K → MAPK.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "p38 and JNK signalling contribute to inflammation, stress-induced apoptosis and insulin resistance; p38 inhibitors have been tested in inflammatory disease with limited success.",
+  "outcomes": ["Stress response", "Apoptosis", "Cytokine production"],
+  "references": [
+    {"label": "KEGG hsa04010 (MAPK signaling)", "url": "https://www.kegg.jp/pathway/hsa04010"},
+    {"label": "Reactome: MAPK family signaling cascades", "url": "https://reactome.org/content/query?q=MAPK%20family%20signaling%20cascades&species=Homo+sapiens"}
+  ],
+  "nodes": [
+    {"id": "stress", "label": "UV, osmotic stress, TNF, IL-1", "type": "stimulus", "compartment": "extracellular"},
+    {"id": "map3k", "label": "MAP3K (ASK1, TAK1, MEKK1)", "type": "kinase", "compartment": "cytoplasm"},
+    {"id": "mkk47", "label": "MKK4/7", "type": "kinase", "compartment": "cytoplasm"},
+    {"id": "mkk36", "label": "MKK3/6", "type": "kinase", "compartment": "cytoplasm"},
+    {"id": "jnk", "label": "JNK", "type": "kinase", "compartment": "cytoplasm", "description": "Phosphorylated on TPY motif."},
+    {"id": "p38", "label": "p38 MAPK", "type": "kinase", "compartment": "cytoplasm", "description": "Phosphorylated on TGY motif."},
+    {"id": "cjun", "label": "c-JUN (AP-1)", "type": "transcription-factor", "compartment": "nucleus"},
+    {"id": "atf2", "label": "ATF2 / MK2", "type": "transcription-factor", "compartment": "nucleus"},
+    {"id": "apop", "label": "Apoptosis", "type": "outcome", "compartment": "outcome", "link": "apoptosis-intrinsic"},
+    {"id": "infl", "label": "Inflammatory cytokines", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "stress", "to": "map3k", "type": "activation"},
+    {"from": "map3k", "to": "mkk47", "type": "phosphorylation"},
+    {"from": "map3k", "to": "mkk36", "type": "phosphorylation"},
+    {"from": "mkk47", "to": "jnk", "type": "phosphorylation"},
+    {"from": "mkk36", "to": "p38", "type": "phosphorylation"},
+    {"from": "jnk", "to": "cjun", "type": "phosphorylation", "label": "Ser63/73"},
+    {"from": "p38", "to": "atf2", "type": "phosphorylation"},
+    {"from": "cjun", "to": "apop", "type": "activation", "evidence": "simplified"},
+    {"from": "atf2", "to": "infl", "type": "activation"}
+  ]
+}

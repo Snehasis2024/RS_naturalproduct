@@ -1,0 +1,36 @@
+{
+  "id": "tgfb",
+  "name": "TGF-β–SMAD",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "TGF-β binds a pair of serine/threonine kinase receptors; the type I receptor phosphorylates SMAD2/3, which partner with SMAD4 and regulate transcription — including cytostatic genes such as p15 and p21.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "TGF-β is growth-inhibitory in normal epithelium but promotes EMT and invasion in advanced cancer (the 'TGF-β paradox'). SMAD4 is lost in ~half of pancreatic cancers.",
+  "outcomes": ["Growth arrest (early)", "EMT, fibrosis, immunosuppression"],
+  "references": [
+    {"label": "KEGG hsa04350 (TGF-beta signaling)", "url": "https://www.kegg.jp/pathway/hsa04350"},
+    {"label": "Massagué (2012) Nat Rev Mol Cell Biol 13:616 — TGFβ signalling in context", "url": "https://doi.org/10.1038/nrm3434"}
+  ],
+  "nodes": [
+    {"id": "tgfb", "label": "TGF-β", "type": "ligand", "ref": "tgfb", "compartment": "extracellular"},
+    {"id": "rii", "label": "TβRII", "type": "receptor", "ref": "tgfbr", "compartment": "membrane"},
+    {"id": "ri", "label": "TβRI (ALK5)", "type": "receptor", "ref": "tgfbr", "compartment": "membrane"},
+    {"id": "smad23", "label": "SMAD2/3", "type": "transcription-factor", "ref": "smad23", "compartment": "cytoplasm"},
+    {"id": "smad4", "label": "SMAD4", "type": "transcription-factor", "ref": "smad4", "compartment": "cytoplasm"},
+    {"id": "complex", "label": "pSMAD2/3–SMAD4", "type": "complex", "ref": "smad4", "compartment": "nucleus"},
+    {"id": "targets", "label": "p15 (CDKN2B), p21, SNAIL", "type": "gene", "compartment": "nucleus"},
+    {"id": "arrest", "label": "G1 arrest", "type": "outcome", "compartment": "outcome"},
+    {"id": "emt", "label": "EMT", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "tgfb", "to": "rii", "type": "binding"},
+    {"from": "rii", "to": "ri", "type": "phosphorylation", "label": "GS domain"},
+    {"from": "ri", "to": "smad23", "type": "phosphorylation", "label": "C-terminal SSXS"},
+    {"from": "smad23", "to": "complex", "type": "binding"},
+    {"from": "smad4", "to": "complex", "type": "binding"},
+    {"from": "complex", "to": "targets", "type": "transcription"},
+    {"from": "targets", "to": "arrest", "type": "activation"},
+    {"from": "targets", "to": "emt", "type": "activation", "evidence": "simplified", "description": "EMT induction depends on cellular context and cooperating signals."}
+  ]
+}

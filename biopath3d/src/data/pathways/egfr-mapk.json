@@ -1,0 +1,54 @@
+{
+  "id": "egfr-mapk",
+  "name": "EGFR → RAS–RAF–MEK–ERK",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "The classical MAPK cascade: a growth factor activates a receptor tyrosine kinase, which switches on RAS and a three-tier kinase relay ending in ERK-driven gene expression and proliferation.",
+  "evidence": "established",
+  "layout": "layered",
+  "location": "Plasma membrane → cytoplasm → nucleus",
+  "clinical": "Hyperactivated in many cancers: EGFR mutations (lung), KRAS (pancreas, colon, lung), BRAF V600E (melanoma). Drugs: erlotinib/osimertinib (EGFR), sotorasib (KRAS G12C), vemurafenib/dabrafenib (BRAF), trametinib (MEK).",
+  "outcomes": ["Cell proliferation", "Survival", "Differentiation (context-dependent)"],
+  "references": [
+    {"label": "KEGG hsa04010 (MAPK signaling)", "url": "https://www.kegg.jp/pathway/hsa04010"},
+    {"label": "KEGG hsa04012 (ErbB signaling)", "url": "https://www.kegg.jp/pathway/hsa04012"},
+    {"label": "Reactome: Signaling by EGFR", "url": "https://reactome.org/content/query?q=Signaling%20by%20EGFR&species=Homo+sapiens"},
+    {"label": "Lavoie, Gagnon & Therrien (2020) Nat Rev Mol Cell Biol 21:607 — ERK signalling review", "url": "https://doi.org/10.1038/s41580-020-0255-7"}
+  ],
+  "nodes": [
+    {"id": "egf", "label": "EGF", "type": "ligand", "ref": "egf", "compartment": "extracellular", "description": "Growth factor ligand."},
+    {"id": "egfr", "label": "EGFR", "type": "receptor", "ref": "egfr", "compartment": "membrane", "description": "Dimerises and autophosphorylates on ligand binding."},
+    {"id": "grb2", "label": "GRB2", "type": "adaptor", "ref": "grb2", "compartment": "cytoplasm"},
+    {"id": "sos", "label": "SOS", "type": "enzyme", "ref": "sos", "compartment": "cytoplasm", "description": "RAS-GEF: swaps GDP for GTP."},
+    {"id": "ras", "label": "RAS-GTP", "type": "gtpase", "ref": "ras", "compartment": "membrane"},
+    {"id": "raf", "label": "RAF", "type": "kinase", "ref": "raf", "compartment": "cytoplasm"},
+    {"id": "mek", "label": "MEK1/2", "type": "kinase", "ref": "mek", "compartment": "cytoplasm"},
+    {"id": "erk", "label": "ERK1/2", "type": "kinase", "ref": "erk", "compartment": "cytoplasm"},
+    {"id": "erkn", "label": "ERK (nuclear)", "type": "kinase", "ref": "erk", "compartment": "nucleus", "description": "Phospho-ERK enters the nucleus."},
+    {"id": "elk1", "label": "ELK1 / SRF", "type": "transcription-factor", "ref": "elk1", "compartment": "nucleus"},
+    {"id": "genes", "label": "FOS, MYC, Cyclin D1", "type": "gene", "ref": "cyclinD", "compartment": "nucleus", "description": "Immediate-early and delayed-early genes."},
+    {"id": "prolif", "label": "Cell proliferation", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "egf", "to": "egfr", "type": "binding", "label": "binds & dimerises"},
+    {"from": "egfr", "to": "grb2", "type": "phosphorylation", "label": "pTyr docks SH2"},
+    {"from": "grb2", "to": "sos", "type": "binding", "label": "SH3 binds SOS"},
+    {"from": "sos", "to": "ras", "type": "activation", "label": "GDP→GTP exchange"},
+    {"from": "ras", "to": "raf", "type": "activation", "label": "recruits & activates"},
+    {"from": "raf", "to": "mek", "type": "phosphorylation", "label": "Ser218/222"},
+    {"from": "mek", "to": "erk", "type": "phosphorylation", "label": "Thr202/Tyr204 (TEY)"},
+    {"from": "erk", "to": "erkn", "type": "translocation", "label": "nuclear entry"},
+    {"from": "erkn", "to": "elk1", "type": "phosphorylation"},
+    {"from": "elk1", "to": "genes", "type": "transcription"},
+    {"from": "genes", "to": "prolif", "type": "activation"},
+    {"from": "erk", "to": "sos", "type": "inhibition", "label": "negative feedback", "description": "ERK phosphorylates SOS, dampening further RAS activation."}
+  ],
+  "steps": [
+    {"title": "1 · Ligand binding", "text": "EGF binds the extracellular domain of EGFR, promoting receptor dimerisation.", "nodes": ["egf", "egfr"], "edges": [["egf", "egfr"]]},
+    {"title": "2 · Autophosphorylation", "text": "The kinase domains activate each other (asymmetric dimer) and phosphorylate tyrosines in the C-terminal tails. These pTyr residues are docking sites for the SH2 domain of GRB2.", "nodes": ["egfr", "grb2"], "edges": [["egfr", "grb2"]]},
+    {"title": "3 · SOS activates RAS", "text": "GRB2 brings the exchange factor SOS to the membrane, where it swaps GDP for GTP on RAS. RAS-GTP is the active switch.", "nodes": ["grb2", "sos", "ras"], "edges": [["grb2", "sos"], ["sos", "ras"]]},
+    {"title": "4 · The kinase cascade", "text": "RAS-GTP recruits RAF, which phosphorylates MEK, which dual-phosphorylates ERK on its TEY motif. Each tier amplifies the signal.", "nodes": ["ras", "raf", "mek", "erk"], "edges": [["ras", "raf"], ["raf", "mek"], ["mek", "erk"]]},
+    {"title": "5 · Into the nucleus", "text": "Active ERK enters the nucleus and phosphorylates transcription factors such as ELK1, inducing FOS and later cyclin D1.", "nodes": ["erk", "erkn", "elk1", "genes"], "edges": [["erk", "erkn"], ["erkn", "elk1"], ["elk1", "genes"]]},
+    {"title": "6 · Proliferation and feedback", "text": "Cyclin D1 drives G1 progression (see Cell-Cycle Regulation). ERK also phosphorylates SOS — a negative feedback loop that limits signal duration.", "nodes": ["genes", "prolif", "erk", "sos"], "edges": [["genes", "prolif"], ["erk", "sos"]]}
+  ]
+}

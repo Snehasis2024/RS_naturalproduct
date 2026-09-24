@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-lab-950: #030712;
+  --color-lab-900: #070d1c;
+  --color-lab-800: #0c1630;
+  --color-lab-700: #14213f;
+  --color-cyan-glow: #22d3ee;
+  --color-violet-glow: #a78bfa;
+}
+
+:root {
+  color-scheme: dark;
+  --panel: rgba(12, 20, 40, 0.62);
+  --panel-strong: rgba(9, 14, 30, 0.93);
+  --border: rgba(148, 197, 255, 0.14);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 800px at 70% -10%, #13204a 0%, transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, #231345 0%, transparent 55%), #050a18;
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+@layer components {
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.glass-strong {
+  background: var(--panel-strong);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--border);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0.6rem;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(148, 197, 255, 0.18);
+  background: rgba(30, 41, 70, 0.55);
+  color: #dbeafe;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+  background: rgba(34, 211, 238, 0.12);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-active {
+  border-color: rgba(34, 211, 238, 0.75);
+  background: rgba(34, 211, 238, 0.18);
+  color: #cffafe;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 0 18px -4px rgba(34, 211, 238, 0.6);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #06b6d4, #7c3aed);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 8px 30px -8px rgba(124, 58, 237, 0.7);
+}
+.btn-primary:hover {
+  filter: brightness(1.12);
+  background: linear-gradient(135deg, #06b6d4, #7c3aed);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.7rem;
+  border: 1px solid rgba(148, 197, 255, 0.18);
+  background: rgba(30, 41, 70, 0.5);
+  color: #cbd5e1;
+}
+button.chip:hover {
+  border-color: rgba(34, 211, 238, 0.6);
+  color: #cffafe;
+}
+
+.label-3d {
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(5, 10, 24, 0.72);
+  border: 1px solid rgba(148, 197, 255, 0.25);
+  color: #e0f2fe;
+}
+.label-3d.hot {
+  border-color: rgba(34, 211, 238, 0.9);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.5);
+}
+.label-3d.dim {
+  opacity: 0.35;
+}
+
+.section-title {
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(148, 197, 255, 0.2);
+  border-radius: 6px;
+}
+
+}
+
+input[type='range'] {
+  accent-color: #22d3ee;
+}
+
+.prose-bio p + p {
+  margin-top: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

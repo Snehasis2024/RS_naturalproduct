@@ -1,0 +1,35 @@
+{
+  "id": "fa-synthesis",
+  "name": "Fatty acid synthesis",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "In the fed state, excess acetyl-CoA is exported from mitochondria as citrate, converted to malonyl-CoA by acetyl-CoA carboxylase, and assembled into palmitate by fatty acid synthase — seven cycles of condensation, reduction, dehydration and reduction, powered by NADPH.",
+  "evidence": "established",
+  "layout": "chain",
+  "location": "Cytosol (liver, adipose, lactating mammary gland)",
+  "net": "8 Acetyl-CoA + 7 ATP + 14 NADPH + 14 H⁺ → Palmitate + 7 ADP + 7 Pᵢ + 14 NADP⁺ + 8 CoA + 6 H₂O",
+  "clinical": "FASN is overexpressed in many cancers. ACC is inhibited by AMPK and by insulin-antagonising hormones; ACC inhibitors are being studied for NASH.",
+  "references": [
+    {"label": "KEGG hsa00061 (Fatty acid biosynthesis)", "url": "https://www.kegg.jp/pathway/hsa00061"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 22.4 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
+  ],
+  "nodes": [
+    {"id": "citrate", "label": "Citrate (exported)", "type": "metabolite", "mol": "citrate", "link": "tca"},
+    {"id": "acetylcoa", "label": "Acetyl-CoA (cytosolic)", "type": "metabolite", "mol": "acetylcoa"},
+    {"id": "malonyl", "label": "Malonyl-CoA", "type": "metabolite"},
+    {"id": "ketoacyl", "label": "β-Ketoacyl-ACP", "type": "metabolite"},
+    {"id": "hydroxyacyl", "label": "D-β-Hydroxyacyl-ACP", "type": "metabolite"},
+    {"id": "enoyl", "label": "trans-Δ²-Enoyl-ACP", "type": "metabolite"},
+    {"id": "acyl", "label": "Acyl-ACP (+2 C per cycle)", "type": "metabolite"},
+    {"id": "palmitate", "label": "Palmitate (C16:0)", "type": "metabolite", "mol": "palmitate"}
+  ],
+  "edges": [
+    {"from": "citrate", "to": "acetylcoa", "type": "conversion", "multiplier": 8, "enzyme": {"name": "ATP-citrate lyase", "ec": "2.3.3.8"}, "cofactorsIn": ["ATP", "CoA"], "cofactorsOut": ["ADP", "Oxaloacetate"], "optional": true, "description": "Export of acetyl units (citrate shuttle). ATP cost of transport is usually excluded from the classic net equation."},
+    {"from": "acetylcoa", "to": "malonyl", "type": "conversion", "multiplier": 7, "enzyme": {"name": "Acetyl-CoA carboxylase", "ec": "6.4.1.2", "ref": "acc", "regulation": "Activated by citrate, insulin; inhibited by AMPK phosphorylation, palmitoyl-CoA"}, "cofactorsIn": ["ATP", "HCO₃⁻"], "cofactorsOut": ["ADP", "Pᵢ"], "energy": {"atp": -1}, "description": "Committed step (biotin carboxyl carrier)."},
+    {"from": "malonyl", "to": "ketoacyl", "type": "conversion", "multiplier": 7, "enzyme": {"name": "FAS: β-ketoacyl-ACP synthase", "ec": "2.3.1.41", "ref": "fasn"}, "cofactorsOut": ["CO₂"], "energy": {"co2": 1}, "description": "Decarboxylation drives the condensation."},
+    {"from": "ketoacyl", "to": "hydroxyacyl", "type": "conversion", "multiplier": 7, "enzyme": {"name": "FAS: β-ketoacyl-ACP reductase", "ec": "1.1.1.100", "ref": "fasn"}, "cofactorsIn": ["NADPH"], "cofactorsOut": ["NADP⁺"], "energy": {"nadph": -1}},
+    {"from": "hydroxyacyl", "to": "enoyl", "type": "conversion", "multiplier": 7, "enzyme": {"name": "FAS: β-hydroxyacyl-ACP dehydratase", "ec": "4.2.1.59", "ref": "fasn"}, "cofactorsOut": ["H₂O"]},
+    {"from": "enoyl", "to": "acyl", "type": "conversion", "multiplier": 7, "enzyme": {"name": "FAS: enoyl-ACP reductase", "ec": "1.3.1.39", "ref": "fasn"}, "cofactorsIn": ["NADPH"], "cofactorsOut": ["NADP⁺"], "energy": {"nadph": -1}},
+    {"from": "acyl", "to": "palmitate", "type": "conversion", "enzyme": {"name": "FAS: thioesterase", "ec": "3.1.2.14", "ref": "fasn"}, "description": "Released after the chain reaches 16 carbons."}
+  ]
+}

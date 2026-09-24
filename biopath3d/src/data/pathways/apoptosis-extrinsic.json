@@ -1,0 +1,45 @@
+{
+  "id": "apoptosis-extrinsic",
+  "name": "Apoptosis — extrinsic (death-receptor) pathway",
+  "category": "apoptosis",
+  "topic": "pathways",
+  "summary": "Death ligands (FasL, TRAIL) on immune cells cluster death receptors on the target cell, assembling the DISC in which caspase-8 is activated. Caspase-8 directly activates caspase-3 (type I cells) and cleaves BID to engage mitochondria (type II cells).",
+  "evidence": "established",
+  "layout": "layered",
+  "location": "Plasma membrane → cytoplasm",
+  "clinical": "Cytotoxic T cells and NK cells kill targets partly via FasL/TRAIL. FAS mutations cause ALPS. c-FLIP overexpression blocks DISC signalling in some tumours.",
+  "outcomes": ["Apoptosis"],
+  "references": [
+    {"label": "KEGG hsa04210 (Apoptosis)", "url": "https://www.kegg.jp/pathway/hsa04210"},
+    {"label": "Reactome: Extrinsic Pathway of Fas/FasL-mediated apoptosis", "url": "https://reactome.org/content/query?q=Extrinsic%20Pathway%20of%20Apoptosis&species=Homo+sapiens"}
+  ],
+  "nodes": [
+    {"id": "fasl", "label": "FasL / TRAIL", "type": "ligand", "ref": "fasl", "compartment": "extracellular"},
+    {"id": "fas", "label": "Death receptor (Fas, DR4/5)", "type": "receptor", "ref": "fas", "compartment": "membrane"},
+    {"id": "disc", "label": "DISC (FADD + procaspase-8)", "type": "complex", "ref": "disc", "compartment": "cytoplasm"},
+    {"id": "flip", "label": "c-FLIP", "type": "inhibitor", "compartment": "cytoplasm", "description": "Catalytically inactive caspase-8 homologue that modulates DISC activity."},
+    {"id": "casp8", "label": "Caspase-8", "type": "enzyme", "ref": "casp8", "compartment": "cytoplasm"},
+    {"id": "bid", "label": "BID → tBID", "type": "protein", "ref": "bid", "compartment": "cytoplasm"},
+    {"id": "mito", "label": "Mitochondrial amplification", "type": "pathway", "ref": "mitochondria", "compartment": "mitochondrion", "link": "apoptosis-intrinsic"},
+    {"id": "casp3", "label": "Caspase-3/7", "type": "enzyme", "ref": "casp3", "compartment": "cytoplasm"},
+    {"id": "apoptosis", "label": "Apoptosis", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "fasl", "to": "fas", "type": "binding", "label": "trimerisation / clustering"},
+    {"from": "fas", "to": "disc", "type": "binding", "label": "death domain → FADD"},
+    {"from": "disc", "to": "casp8", "type": "activation", "label": "induced proximity"},
+    {"from": "flip", "to": "disc", "type": "inhibition"},
+    {"from": "casp8", "to": "casp3", "type": "cleavage", "label": "type I cells"},
+    {"from": "casp8", "to": "bid", "type": "cleavage", "label": "type II cells"},
+    {"from": "bid", "to": "mito", "type": "activation", "label": "activates BAX/BAK"},
+    {"from": "mito", "to": "casp3", "type": "activation", "label": "via cytochrome c → caspase-9"},
+    {"from": "casp3", "to": "apoptosis", "type": "activation"}
+  ],
+  "steps": [
+    {"title": "1 · Death ligand", "text": "Trimeric FasL on a cytotoxic lymphocyte clusters Fas receptors on the target cell.", "nodes": ["fasl", "fas"], "edges": [["fasl", "fas"]]},
+    {"title": "2 · DISC assembly", "text": "Receptor death domains recruit FADD, whose death-effector domain recruits procaspase-8. c-FLIP can compete and blunt activation.", "nodes": ["fas", "disc", "flip"], "edges": [["fas", "disc"], ["flip", "disc"]]},
+    {"title": "3 · Caspase-8", "text": "Clustering forces procaspase-8 molecules together; they dimerise and auto-process into active caspase-8.", "nodes": ["disc", "casp8"], "edges": [["disc", "casp8"]]},
+    {"title": "4 · Two routes to caspase-3", "text": "In type I cells caspase-8 activates caspase-3 directly. In type II cells, caspase-8 cleaves BID; tBID activates BAX/BAK to engage the mitochondrial pathway as an amplifier.", "nodes": ["casp8", "casp3", "bid", "mito"], "edges": [["casp8", "casp3"], ["casp8", "bid"], ["bid", "mito"], ["mito", "casp3"]]},
+    {"title": "5 · Execution", "text": "Caspase-3 dismantles the cell.", "nodes": ["casp3", "apoptosis"], "edges": [["casp3", "apoptosis"]]}
+  ]
+}

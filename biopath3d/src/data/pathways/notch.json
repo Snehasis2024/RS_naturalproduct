@@ -1,0 +1,21 @@
+{
+  "pathway": "Notch",
+  "id": "notch",
+  "category": "signaling",
+  "summary": "Juxtacrine signalling: a Delta/Jagged ligand on one cell triggers two proteolytic cleavages of Notch on the neighbouring cell, releasing the Notch intracellular domain (NICD) that acts directly as a transcriptional co-activator. (This file uses the compact 'steps/next' authoring format.)",
+  "evidence": "established",
+  "references": [
+    {"label": "KEGG hsa04330 (Notch signaling)", "url": "https://www.kegg.jp/pathway/hsa04330"},
+    {"label": "Kopan & Ilagan (2009) Cell 137:216 — The canonical Notch signaling pathway", "url": "https://doi.org/10.1016/j.cell.2009.03.045"}
+  ],
+  "steps": [
+    {"name": "Delta / Jagged (neighbouring cell)", "id": "dll", "type": "ligand", "compartment": "extracellular", "function": "Membrane-bound ligand presented by an adjacent cell.", "next": "notch", "edge": "binding"},
+    {"name": "NOTCH receptor", "id": "notch", "type": "receptor", "ref": "notch", "compartment": "membrane", "function": "Ligand endocytosis in the sending cell exerts a pulling force that exposes the S2 site.", "next": "adam", "edge": "activation"},
+    {"name": "ADAM10 (S2 cleavage)", "id": "adam", "type": "enzyme", "compartment": "membrane", "function": "Metalloprotease removes the extracellular domain.", "next": "gsec", "edge": "cleavage"},
+    {"name": "γ-Secretase (S3 cleavage)", "id": "gsec", "type": "enzyme", "compartment": "membrane", "function": "Intramembrane protease (presenilin) releases NICD. Target of γ-secretase inhibitors.", "next": "nicd", "edge": "cleavage"},
+    {"name": "NICD", "id": "nicd", "type": "transcription-factor", "ref": "notch", "compartment": "cytoplasm", "function": "Notch intracellular domain.", "next": "csl", "edge": "translocation"},
+    {"name": "CSL/RBPJ + Mastermind", "id": "csl", "type": "transcription-factor", "compartment": "nucleus", "function": "NICD displaces co-repressors from CSL and recruits MAML and co-activators.", "next": "hes", "edge": "transcription"},
+    {"name": "HES / HEY genes", "id": "hes", "type": "gene", "compartment": "nucleus", "function": "bHLH repressors that implement lateral inhibition.", "next": "fate", "edge": "activation"},
+    {"name": "Cell-fate decision", "id": "fate", "type": "outcome", "compartment": "outcome", "function": "Lateral inhibition, stem-cell maintenance, T-cell development."}
+  ]
+}

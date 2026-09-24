@@ -78,3 +78,7 @@ To publish it online, go to the repository's **Settings → Pages**, choose **De
 ```bash
 python -m pytest -q
 ```
+
+## BioPath 3D (interactive biology lab)
+
+[`biopath3d/`](biopath3d/) is a separate web app: an interactive 3D platform for learning cell and molecular biology. It covers the cell, the cell cycle, DNA → RNA → protein, signalling, metabolism, apoptosis, a molecular viewer, guided lessons, quizzes and the BioTutor. See [`biopath3d/README.md`](biopath3d/README.md).

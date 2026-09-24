@@ -1,0 +1,45 @@
+{
+  "id": "glycolysis",
+  "name": "Glycolysis",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "Ten cytosolic reactions split one glucose (C6) into two pyruvate (C3). The preparatory phase invests 2 ATP; the payoff phase (run twice per glucose) yields 4 ATP and 2 NADH.",
+  "evidence": "established",
+  "layout": "chain",
+  "location": "Cytosol",
+  "net": "Glucose + 2 NAD⁺ + 2 ADP + 2 Pᵢ → 2 Pyruvate + 2 NADH + 2 H⁺ + 2 ATP + 2 H₂O",
+  "clinical": "Cancer cells upregulate glycolysis even with oxygen (Warburg effect), the basis of ¹⁸F-FDG PET imaging. Pyruvate kinase deficiency causes haemolytic anaemia; red cells rely entirely on glycolysis.",
+  "references": [
+    {"label": "KEGG hsa00010 (Glycolysis / Gluconeogenesis)", "url": "https://www.kegg.jp/pathway/hsa00010"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 16 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"},
+    {"label": "Reactome: Glycolysis", "url": "https://reactome.org/content/query?q=Glycolysis&species=Homo+sapiens"}
+  ],
+  "nodes": [
+    {"id": "glucose", "label": "Glucose", "type": "metabolite", "mol": "glucose"},
+    {"id": "g6p", "label": "Glucose-6-phosphate", "type": "metabolite", "mol": "g6p"},
+    {"id": "f6p", "label": "Fructose-6-phosphate", "type": "metabolite", "mol": "f6p"},
+    {"id": "f16bp", "label": "Fructose-1,6-bisphosphate", "type": "metabolite", "mol": "f16bp"},
+    {"id": "dhap", "label": "DHAP", "type": "metabolite", "mol": "dhap"},
+    {"id": "g3p", "label": "Glyceraldehyde-3-phosphate (×2)", "type": "metabolite", "mol": "g3p"},
+    {"id": "bpg13", "label": "1,3-Bisphosphoglycerate", "type": "metabolite", "mol": "bpg13"},
+    {"id": "pg3", "label": "3-Phosphoglycerate", "type": "metabolite", "mol": "pg3"},
+    {"id": "pg2", "label": "2-Phosphoglycerate", "type": "metabolite", "mol": "pg2"},
+    {"id": "pep", "label": "Phosphoenolpyruvate", "type": "metabolite", "mol": "pep"},
+    {"id": "pyruvate", "label": "Pyruvate (×2)", "type": "metabolite", "mol": "pyruvate", "link": "tca"},
+    {"id": "lactate", "label": "Lactate (anaerobic)", "type": "metabolite", "mol": "lactate"}
+  ],
+  "edges": [
+    {"from": "glucose", "to": "g6p", "type": "conversion", "enzyme": {"name": "Hexokinase", "ec": "2.7.1.1", "ref": "hexokinase", "regulation": "Hexokinases I–III inhibited by G6P"}, "cofactorsIn": ["ATP"], "cofactorsOut": ["ADP"], "energy": {"atp": -1}, "description": "Phosphorylation traps glucose inside the cell. Irreversible (ΔG ≈ −34 kJ/mol in cells)."},
+    {"from": "g6p", "to": "f6p", "type": "conversion", "enzyme": {"name": "Phosphoglucose isomerase", "ec": "5.3.1.9"}, "reversible": true, "description": "Aldose → ketose isomerisation."},
+    {"from": "f6p", "to": "f16bp", "type": "conversion", "enzyme": {"name": "Phosphofructokinase-1", "ec": "2.7.1.11", "ref": "pfk1", "regulation": "Inhibited by ATP, citrate; activated by AMP, fructose-2,6-bisphosphate"}, "cofactorsIn": ["ATP"], "cofactorsOut": ["ADP"], "energy": {"atp": -1}, "description": "Committed, rate-limiting step. Irreversible."},
+    {"from": "f16bp", "to": "g3p", "type": "conversion", "enzyme": {"name": "Aldolase", "ec": "4.1.2.13"}, "reversible": true, "description": "Retro-aldol cleavage of the C6 sugar into two trioses: G3P and DHAP."},
+    {"from": "f16bp", "to": "dhap", "type": "conversion", "enzyme": {"name": "Aldolase", "ec": "4.1.2.13"}, "reversible": true, "optional": true},
+    {"from": "dhap", "to": "g3p", "type": "conversion", "enzyme": {"name": "Triose phosphate isomerase", "ec": "5.3.1.1"}, "reversible": true, "optional": true, "description": "Converts DHAP into a second G3P, so everything downstream happens twice per glucose."},
+    {"from": "g3p", "to": "bpg13", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Glyceraldehyde-3-phosphate dehydrogenase", "ec": "1.2.1.12", "ref": "gapdh"}, "cofactorsIn": ["NAD⁺", "Pᵢ"], "cofactorsOut": ["NADH"], "energy": {"nadh": 1}, "reversible": true, "description": "Oxidation coupled to phosphorylation: forms a high-energy acyl phosphate."},
+    {"from": "bpg13", "to": "pg3", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Phosphoglycerate kinase", "ec": "2.7.2.3"}, "cofactorsIn": ["ADP"], "cofactorsOut": ["ATP"], "energy": {"atp": 1}, "reversible": true, "description": "First substrate-level phosphorylation."},
+    {"from": "pg3", "to": "pg2", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Phosphoglycerate mutase", "ec": "5.4.2.11"}, "reversible": true},
+    {"from": "pg2", "to": "pep", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Enolase", "ec": "4.2.1.11", "regulation": "Inhibited by fluoride"}, "cofactorsOut": ["H₂O"], "energy": {"h2o": 1}, "reversible": true, "description": "Dehydration creates the high phosphoryl-transfer potential of PEP."},
+    {"from": "pep", "to": "pyruvate", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Pyruvate kinase", "ec": "2.7.1.40", "ref": "pyruvateKinase", "regulation": "Activated by F1,6BP (feed-forward); liver isoform inhibited by ATP, alanine and PKA phosphorylation"}, "cofactorsIn": ["ADP"], "cofactorsOut": ["ATP"], "energy": {"atp": 1}, "description": "Second substrate-level phosphorylation. Irreversible."},
+    {"from": "pyruvate", "to": "lactate", "type": "conversion", "optional": true, "enzyme": {"name": "Lactate dehydrogenase", "ec": "1.1.1.27"}, "cofactorsIn": ["NADH"], "cofactorsOut": ["NAD⁺"], "reversible": true, "description": "Without O₂ (or in red cells), LDH regenerates NAD⁺ so GAPDH can continue."}
+  ]
+}

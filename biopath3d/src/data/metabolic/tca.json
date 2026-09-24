@@ -1,0 +1,40 @@
+{
+  "id": "tca",
+  "name": "TCA (citric acid / Krebs) cycle",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "In the mitochondrial matrix, acetyl-CoA is oxidised to 2 CO₂. Each turn captures the released energy as 3 NADH, 1 FADH₂ and 1 GTP; oxaloacetate is regenerated. The cycle also supplies biosynthetic precursors (citrate, α-ketoglutarate, succinyl-CoA, oxaloacetate).",
+  "evidence": "established",
+  "layout": "cycle",
+  "location": "Mitochondrial matrix (succinate dehydrogenase in the inner membrane)",
+  "net": "Acetyl-CoA + 3 NAD⁺ + FAD + GDP + Pᵢ + 2 H₂O → 2 CO₂ + 3 NADH + FADH₂ + GTP + CoA + 3 H⁺",
+  "clinical": "Mutations in succinate dehydrogenase (SDHx) and fumarate hydratase cause hereditary paraganglioma and renal cancer; IDH1/2 mutations produce the oncometabolite 2-hydroxyglutarate (glioma, AML; ivosidenib/enasidenib).",
+  "references": [
+    {"label": "KEGG hsa00020 (Citrate cycle)", "url": "https://www.kegg.jp/pathway/hsa00020"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 17 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
+  ],
+  "nodes": [
+    {"id": "pyruvate", "label": "Pyruvate", "type": "metabolite", "mol": "pyruvate", "link": "glycolysis"},
+    {"id": "acetylcoa", "label": "Acetyl-CoA", "type": "metabolite", "mol": "acetylcoa"},
+    {"id": "citrate", "label": "Citrate", "type": "metabolite", "mol": "citrate"},
+    {"id": "isocitrate", "label": "Isocitrate", "type": "metabolite", "mol": "isocitrate"},
+    {"id": "akg", "label": "α-Ketoglutarate", "type": "metabolite", "mol": "akg"},
+    {"id": "succoa", "label": "Succinyl-CoA", "type": "metabolite"},
+    {"id": "succinate", "label": "Succinate", "type": "metabolite", "mol": "succinate"},
+    {"id": "fumarate", "label": "Fumarate", "type": "metabolite", "mol": "fumarate"},
+    {"id": "malate", "label": "L-Malate", "type": "metabolite", "mol": "malate"},
+    {"id": "oaa", "label": "Oxaloacetate", "type": "metabolite", "mol": "oxaloacetate"}
+  ],
+  "edges": [
+    {"from": "pyruvate", "to": "acetylcoa", "type": "conversion", "optional": true, "enzyme": {"name": "Pyruvate dehydrogenase complex", "ec": "1.2.4.1", "ref": "pdh", "regulation": "Inhibited by PDK phosphorylation, acetyl-CoA, NADH"}, "cofactorsIn": ["CoA", "NAD⁺"], "cofactorsOut": ["NADH", "CO₂"], "description": "Entry point (not part of the cycle proper). Requires TPP, lipoate, CoA, FAD, NAD⁺."},
+    {"from": "acetylcoa", "to": "citrate", "type": "conversion", "optional": true, "enzyme": {"name": "Citrate synthase", "ec": "2.3.3.1", "ref": "citrateSynthase"}, "cofactorsOut": ["CoA"], "description": "Acetyl-CoA condenses with oxaloacetate."},
+    {"from": "oaa", "to": "citrate", "type": "conversion", "enzyme": {"name": "Citrate synthase", "ec": "2.3.3.1", "ref": "citrateSynthase", "regulation": "Inhibited by citrate, succinyl-CoA, NADH"}, "cofactorsIn": ["Acetyl-CoA"], "description": "Irreversible condensation."},
+    {"from": "citrate", "to": "isocitrate", "type": "conversion", "enzyme": {"name": "Aconitase", "ec": "4.2.1.3"}, "reversible": true, "description": "Isomerisation via cis-aconitate (Fe–S enzyme)."},
+    {"from": "isocitrate", "to": "akg", "type": "conversion", "enzyme": {"name": "Isocitrate dehydrogenase", "ec": "1.1.1.41", "regulation": "Activated by ADP, Ca²⁺; inhibited by ATP, NADH"}, "cofactorsIn": ["NAD⁺"], "cofactorsOut": ["NADH", "CO₂"], "energy": {"nadh": 1, "co2": 1}},
+    {"from": "akg", "to": "succoa", "type": "conversion", "enzyme": {"name": "α-Ketoglutarate dehydrogenase", "ec": "1.2.4.2", "regulation": "Inhibited by succinyl-CoA, NADH; activated by Ca²⁺"}, "cofactorsIn": ["NAD⁺", "CoA"], "cofactorsOut": ["NADH", "CO₂"], "energy": {"nadh": 1, "co2": 1}},
+    {"from": "succoa", "to": "succinate", "type": "conversion", "enzyme": {"name": "Succinyl-CoA synthetase", "ec": "6.2.1.4"}, "cofactorsIn": ["GDP", "Pᵢ"], "cofactorsOut": ["GTP", "CoA"], "energy": {"gtp": 1}, "reversible": true, "description": "Substrate-level phosphorylation (GTP-forming isoform; an ADP-forming isoform also exists)."},
+    {"from": "succinate", "to": "fumarate", "type": "conversion", "enzyme": {"name": "Succinate dehydrogenase (complex II)", "ec": "1.3.5.1", "regulation": "Inhibited by malonate (competitive)"}, "cofactorsIn": ["FAD"], "cofactorsOut": ["FADH₂"], "energy": {"fadh2": 1}, "reversible": true, "description": "The only TCA enzyme embedded in the inner membrane; passes electrons directly to ubiquinone."},
+    {"from": "fumarate", "to": "malate", "type": "conversion", "enzyme": {"name": "Fumarase", "ec": "4.2.1.2"}, "reversible": true},
+    {"from": "malate", "to": "oaa", "type": "conversion", "enzyme": {"name": "Malate dehydrogenase", "ec": "1.1.1.37"}, "cofactorsIn": ["NAD⁺"], "cofactorsOut": ["NADH"], "energy": {"nadh": 1}, "reversible": true, "description": "Unfavourable (ΔG°′ ≈ +30 kJ/mol) but pulled forward by rapid consumption of oxaloacetate."}
+  ]
+}

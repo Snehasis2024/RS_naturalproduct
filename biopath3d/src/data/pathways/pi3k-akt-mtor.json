@@ -1,0 +1,60 @@
+{
+  "id": "pi3k-akt-mtor",
+  "name": "PI3K–AKT–mTOR",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "Growth-factor receptors activate PI3K, which produces PIP₃ to recruit and activate AKT. AKT promotes survival and activates mTORC1, the master regulator of cell growth (protein, lipid and nucleotide synthesis).",
+  "evidence": "established",
+  "layout": "layered",
+  "location": "Plasma membrane → cytoplasm → lysosome surface",
+  "clinical": "PIK3CA mutations and PTEN loss are among the most common oncogenic events. Drugs: alpelisib (PI3Kα), capivasertib (AKT), everolimus (mTORC1).",
+  "outcomes": ["Cell growth", "Survival", "Glucose uptake"],
+  "references": [
+    {"label": "KEGG hsa04151 (PI3K-Akt signaling)", "url": "https://www.kegg.jp/pathway/hsa04151"},
+    {"label": "KEGG hsa04150 (mTOR signaling)", "url": "https://www.kegg.jp/pathway/hsa04150"},
+    {"label": "Manning & Toker (2017) Cell 169:381 — AKT/PKB signaling", "url": "https://doi.org/10.1016/j.cell.2017.04.001"},
+    {"label": "Saxton & Sabatini (2017) Cell 168:960 — mTOR signaling", "url": "https://doi.org/10.1016/j.cell.2017.02.004"}
+  ],
+  "nodes": [
+    {"id": "gf", "label": "Growth factor / insulin", "type": "ligand", "ref": "egf", "compartment": "extracellular"},
+    {"id": "rtk", "label": "RTK (EGFR / INSR)", "type": "receptor", "ref": "egfr", "compartment": "membrane"},
+    {"id": "pi3k", "label": "PI3K", "type": "kinase", "ref": "pi3k", "compartment": "membrane"},
+    {"id": "pip3", "label": "PIP₃", "type": "second-messenger", "ref": "pip3", "compartment": "membrane"},
+    {"id": "pten", "label": "PTEN", "type": "phosphatase", "ref": "pten", "compartment": "cytoplasm"},
+    {"id": "pdk1", "label": "PDK1", "type": "kinase", "ref": "pdk1", "compartment": "cytoplasm"},
+    {"id": "akt", "label": "AKT", "type": "kinase", "ref": "akt", "compartment": "cytoplasm"},
+    {"id": "tsc", "label": "TSC1/2", "type": "complex", "ref": "tsc", "compartment": "cytoplasm"},
+    {"id": "bad", "label": "BAD", "type": "protein", "ref": "bad", "compartment": "cytoplasm"},
+    {"id": "rheb", "label": "RHEB-GTP", "type": "gtpase", "ref": "rheb", "compartment": "cytoplasm"},
+    {"id": "mtorc1", "label": "mTORC1", "type": "complex", "ref": "mtor", "compartment": "cytoplasm"},
+    {"id": "s6k", "label": "S6K1", "type": "kinase", "ref": "s6k", "compartment": "cytoplasm"},
+    {"id": "4ebp1", "label": "4E-BP1", "type": "inhibitor", "ref": "eif4ebp1", "compartment": "cytoplasm"},
+    {"id": "growth", "label": "Protein synthesis / cell growth", "type": "outcome", "compartment": "outcome"},
+    {"id": "survival", "label": "Cell survival", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "gf", "to": "rtk", "type": "binding"},
+    {"from": "rtk", "to": "pi3k", "type": "activation", "label": "p85 binds pTyr"},
+    {"from": "pi3k", "to": "pip3", "type": "phosphorylation", "label": "PIP₂ → PIP₃"},
+    {"from": "pten", "to": "pip3", "type": "dephosphorylation", "label": "PIP₃ → PIP₂"},
+    {"from": "pip3", "to": "pdk1", "type": "binding", "label": "PH-domain recruitment"},
+    {"from": "pip3", "to": "akt", "type": "binding", "label": "PH-domain recruitment"},
+    {"from": "pdk1", "to": "akt", "type": "phosphorylation", "label": "Thr308"},
+    {"from": "akt", "to": "tsc", "type": "inhibition", "label": "phosphorylates TSC2"},
+    {"from": "akt", "to": "bad", "type": "inhibition", "label": "phosphorylates BAD"},
+    {"from": "tsc", "to": "rheb", "type": "inhibition", "label": "GAP activity"},
+    {"from": "rheb", "to": "mtorc1", "type": "activation"},
+    {"from": "mtorc1", "to": "s6k", "type": "phosphorylation"},
+    {"from": "mtorc1", "to": "4ebp1", "type": "inhibition", "label": "phosphorylation releases eIF4E"},
+    {"from": "s6k", "to": "growth", "type": "activation"},
+    {"from": "4ebp1", "to": "growth", "type": "inhibition"},
+    {"from": "bad", "to": "survival", "type": "inhibition", "description": "Active BAD promotes apoptosis; inhibited BAD permits survival."}
+  ],
+  "steps": [
+    {"title": "1 · PI3K makes PIP₃", "text": "Activated receptors recruit class IA PI3K, which phosphorylates the membrane lipid PIP₂ at the 3′ position to make PIP₃. PTEN reverses this reaction.", "nodes": ["rtk", "pi3k", "pip3", "pten"], "edges": [["rtk", "pi3k"], ["pi3k", "pip3"], ["pten", "pip3"]]},
+    {"title": "2 · AKT activation", "text": "AKT and PDK1 bind PIP₃ through PH domains. PDK1 phosphorylates AKT Thr308 (mTORC2 phosphorylates Ser473 for full activity; not shown).", "nodes": ["pip3", "pdk1", "akt"], "edges": [["pip3", "pdk1"], ["pip3", "akt"], ["pdk1", "akt"]]},
+    {"title": "3 · Double negative to mTORC1", "text": "AKT phosphorylates and inhibits TSC2. TSC normally inactivates RHEB, so inhibiting TSC lets RHEB-GTP accumulate and activate mTORC1 (an inhibition of an inhibitor = activation).", "nodes": ["akt", "tsc", "rheb", "mtorc1"], "edges": [["akt", "tsc"], ["tsc", "rheb"], ["rheb", "mtorc1"]]},
+    {"title": "4 · Growth output", "text": "mTORC1 phosphorylates S6K (activating it) and 4E-BP1 (inactivating it, freeing eIF4E), increasing cap-dependent translation and cell growth.", "nodes": ["mtorc1", "s6k", "4ebp1", "growth"], "edges": [["mtorc1", "s6k"], ["mtorc1", "4ebp1"], ["s6k", "growth"], ["4ebp1", "growth"]]},
+    {"title": "5 · Survival", "text": "AKT phosphorylates the pro-apoptotic BH3-only protein BAD, sequestering it and promoting survival (see Apoptosis).", "nodes": ["akt", "bad", "survival"], "edges": [["akt", "bad"], ["bad", "survival"]]}
+  ]
+}

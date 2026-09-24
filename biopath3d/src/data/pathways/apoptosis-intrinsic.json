@@ -1,0 +1,56 @@
+{
+  "id": "apoptosis-intrinsic",
+  "name": "Apoptosis — intrinsic (mitochondrial) pathway",
+  "category": "apoptosis",
+  "topic": "pathways",
+  "summary": "Internal stress (DNA damage, growth-factor withdrawal, ER stress) activates BH3-only proteins that overcome BCL-2 and activate BAX/BAK. Mitochondrial outer membrane permeabilisation releases cytochrome c, which builds the apoptosome to activate caspase-9 and then executioner caspase-3.",
+  "evidence": "established",
+  "layout": "layered",
+  "location": "Cytoplasm & mitochondria",
+  "clinical": "Cancer cells often overexpress BCL-2 family survival proteins; venetoclax (BH3 mimetic) restores apoptosis in CLL/AML. p53 loss removes a major route to PUMA/NOXA induction.",
+  "outcomes": ["Apoptosis: DNA fragmentation, blebbing, PS exposure, phagocytic clearance without inflammation"],
+  "references": [
+    {"label": "KEGG hsa04210 (Apoptosis)", "url": "https://www.kegg.jp/pathway/hsa04210"},
+    {"label": "Singh, Letai & Sarosiek (2019) Nat Rev Mol Cell Biol 20:175 — BCL-2 family", "url": "https://doi.org/10.1038/s41580-018-0089-8"}
+  ],
+  "nodes": [
+    {"id": "stress", "label": "Cell stress (DNA damage, GF withdrawal)", "type": "stimulus", "compartment": "cytoplasm"},
+    {"id": "p53", "label": "p53", "type": "transcription-factor", "ref": "p53", "compartment": "nucleus"},
+    {"id": "bh3", "label": "BH3-only (PUMA, NOXA, BIM)", "type": "protein", "ref": "bh3", "compartment": "cytoplasm"},
+    {"id": "bcl2", "label": "BCL-2 / BCL-xL", "type": "inhibitor", "ref": "bcl2", "compartment": "mitochondrion"},
+    {"id": "baxbak", "label": "BAX / BAK", "type": "protein", "ref": "baxbak", "compartment": "mitochondrion"},
+    {"id": "mito", "label": "Mitochondria (MOMP)", "type": "organelle", "ref": "mitochondria", "compartment": "mitochondrion"},
+    {"id": "cytc", "label": "Cytochrome c", "type": "protein", "ref": "cytc", "compartment": "cytoplasm"},
+    {"id": "smac", "label": "SMAC", "type": "protein", "ref": "smac", "compartment": "cytoplasm"},
+    {"id": "apaf1", "label": "APAF-1 apoptosome", "type": "complex", "ref": "apaf1", "compartment": "cytoplasm"},
+    {"id": "casp9", "label": "Caspase-9", "type": "enzyme", "ref": "casp9", "compartment": "cytoplasm"},
+    {"id": "xiap", "label": "XIAP", "type": "inhibitor", "ref": "xiap", "compartment": "cytoplasm"},
+    {"id": "casp3", "label": "Caspase-3/7", "type": "enzyme", "ref": "casp3", "compartment": "cytoplasm"},
+    {"id": "apoptosis", "label": "Apoptosis", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "stress", "to": "p53", "type": "activation"},
+    {"from": "stress", "to": "bh3", "type": "activation", "label": "BIM (GF withdrawal)"},
+    {"from": "p53", "to": "bh3", "type": "transcription", "label": "PUMA, NOXA"},
+    {"from": "bh3", "to": "bcl2", "type": "inhibition", "label": "neutralise"},
+    {"from": "bcl2", "to": "baxbak", "type": "inhibition"},
+    {"from": "bh3", "to": "baxbak", "type": "activation", "label": "direct activation"},
+    {"from": "baxbak", "to": "mito", "type": "activation", "label": "pore formation"},
+    {"from": "mito", "to": "cytc", "type": "release"},
+    {"from": "mito", "to": "smac", "type": "release"},
+    {"from": "cytc", "to": "apaf1", "type": "binding", "label": "+ dATP → heptamer"},
+    {"from": "apaf1", "to": "casp9", "type": "activation", "label": "induced proximity"},
+    {"from": "casp9", "to": "casp3", "type": "cleavage"},
+    {"from": "xiap", "to": "casp9", "type": "inhibition"},
+    {"from": "xiap", "to": "casp3", "type": "inhibition"},
+    {"from": "smac", "to": "xiap", "type": "inhibition"},
+    {"from": "casp3", "to": "apoptosis", "type": "activation", "label": "cleaves PARP, ICAD, lamins"}
+  ],
+  "steps": [
+    {"title": "1 · Stress is sensed", "text": "DNA damage stabilises p53, which induces the BH3-only genes PUMA and NOXA; growth-factor withdrawal releases BIM.", "nodes": ["stress", "p53", "bh3"], "edges": [["stress", "p53"], ["p53", "bh3"], ["stress", "bh3"]]},
+    {"title": "2 · Overcoming BCL-2", "text": "BH3-only proteins bind anti-apoptotic BCL-2/BCL-xL and directly activate BAX and BAK.", "nodes": ["bh3", "bcl2", "baxbak"], "edges": [["bh3", "bcl2"], ["bcl2", "baxbak"], ["bh3", "baxbak"]]},
+    {"title": "3 · MOMP", "text": "BAX/BAK oligomerise in the mitochondrial outer membrane, releasing cytochrome c and SMAC. This is usually the point of no return.", "nodes": ["baxbak", "mito", "cytc", "smac"], "edges": [["baxbak", "mito"], ["mito", "cytc"], ["mito", "smac"]]},
+    {"title": "4 · Apoptosome", "text": "Cytochrome c binds APAF-1, which (with dATP) assembles into a heptameric apoptosome that activates caspase-9.", "nodes": ["cytc", "apaf1", "casp9"], "edges": [["cytc", "apaf1"], ["apaf1", "casp9"]]},
+    {"title": "5 · Execution", "text": "Caspase-9 cleaves and activates caspase-3/7. SMAC neutralises XIAP so caspases are not blocked. Caspase-3 cleaves hundreds of substrates, dismantling the cell.", "nodes": ["casp9", "casp3", "xiap", "smac", "apoptosis"], "edges": [["casp9", "casp3"], ["smac", "xiap"], ["casp3", "apoptosis"]]}
+  ]
+}

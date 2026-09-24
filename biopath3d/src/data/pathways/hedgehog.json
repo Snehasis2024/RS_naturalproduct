@@ -1,0 +1,21 @@
+{
+  "pathway": "Hedgehog",
+  "id": "hedgehog",
+  "category": "signaling",
+  "summary": "In vertebrates Hedgehog signalling is organised around the primary cilium. PTCH1 represses SMO; Hedgehog binding to PTCH1 lifts this repression, SMO accumulates in the cilium, and GLI transcription factors are converted to activators. (Compact 'steps/next' authoring format.)",
+  "evidence": "established",
+  "references": [
+    {"label": "KEGG hsa04340 (Hedgehog signaling)", "url": "https://www.kegg.jp/pathway/hsa04340"},
+    {"label": "Briscoe & Thérond (2013) Nat Rev Mol Cell Biol 14:416 — Hedgehog signalling", "url": "https://doi.org/10.1038/nrm3598"}
+  ],
+  "steps": [
+    {"name": "Sonic hedgehog (SHH)", "id": "shh", "type": "ligand", "ref": "shh", "compartment": "extracellular", "next": "ptch", "edge": "binding"},
+    {"name": "PTCH1", "id": "ptch", "type": "receptor", "ref": "ptch", "compartment": "membrane", "function": "Represses SMO; inactivated by ligand.", "next": "smo", "edge": "inhibition"},
+    {"name": "Smoothened (SMO)", "id": "smo", "type": "receptor", "ref": "smo", "compartment": "membrane", "function": "Accumulates in the primary cilium when de-repressed. Target of vismodegib.", "next": "sufu", "edge": "inhibition"},
+    {"name": "SUFU", "id": "sufu", "type": "inhibitor", "ref": "sufu", "compartment": "cytoplasm", "next": "gli", "edge": "inhibition"},
+    {"name": "GLI activators", "id": "gli", "type": "transcription-factor", "ref": "gli", "compartment": "cytoplasm", "next": "glin", "edge": "translocation"},
+    {"name": "GLI (nuclear)", "id": "glin", "type": "transcription-factor", "ref": "gli", "compartment": "nucleus", "next": "targets", "edge": "transcription"},
+    {"name": "PTCH1, GLI1, cyclin D, MYCN", "id": "targets", "type": "gene", "compartment": "nucleus", "next": "out", "edge": "activation"},
+    {"name": "Patterning / proliferation", "id": "out", "type": "outcome", "compartment": "outcome"}
+  ]
+}

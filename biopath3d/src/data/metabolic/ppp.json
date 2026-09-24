@@ -1,0 +1,35 @@
+{
+  "id": "ppp",
+  "name": "Pentose phosphate pathway",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "A cytosolic branch from glucose-6-phosphate. The oxidative phase produces NADPH (for reductive biosynthesis and antioxidant defence) and ribose-5-phosphate (for nucleotides); the non-oxidative phase interconverts sugars and returns carbon to glycolysis.",
+  "evidence": "established",
+  "layout": "chain",
+  "location": "Cytosol",
+  "net": "G6P + 2 NADP⁺ + H₂O → Ribulose-5-P + 2 NADPH + 2 H⁺ + CO₂ (oxidative phase)",
+  "clinical": "G6PD deficiency: red cells cannot regenerate NADPH, glutathione stays oxidised, and oxidant drugs or fava beans trigger haemolysis (Heinz bodies).",
+  "references": [
+    {"label": "KEGG hsa00030 (Pentose phosphate pathway)", "url": "https://www.kegg.jp/pathway/hsa00030"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 20 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
+  ],
+  "nodes": [
+    {"id": "g6p", "label": "Glucose-6-phosphate", "type": "metabolite", "mol": "g6p", "link": "glycolysis"},
+    {"id": "6pgl", "label": "6-Phosphoglucono-δ-lactone", "type": "metabolite"},
+    {"id": "6pg", "label": "6-Phosphogluconate", "type": "metabolite"},
+    {"id": "ru5p", "label": "Ribulose-5-phosphate", "type": "metabolite"},
+    {"id": "r5p", "label": "Ribose-5-phosphate", "type": "metabolite", "mol": "r5p"},
+    {"id": "nucleotides", "label": "Nucleotide synthesis", "type": "process"},
+    {"id": "x5p", "label": "Xylulose-5-phosphate", "type": "metabolite"},
+    {"id": "glyc", "label": "F6P + G3P (back to glycolysis)", "type": "metabolite", "mol": "f6p", "link": "glycolysis"}
+  ],
+  "edges": [
+    {"from": "g6p", "to": "6pgl", "type": "conversion", "enzyme": {"name": "Glucose-6-phosphate dehydrogenase", "ec": "1.1.1.49", "ref": "g6pd", "regulation": "Rate-limiting; inhibited by NADPH, stimulated by NADP⁺"}, "cofactorsIn": ["NADP⁺"], "cofactorsOut": ["NADPH"], "energy": {"nadph": 1}},
+    {"from": "6pgl", "to": "6pg", "type": "conversion", "enzyme": {"name": "6-Phosphogluconolactonase", "ec": "3.1.1.31"}, "cofactorsIn": ["H₂O"]},
+    {"from": "6pg", "to": "ru5p", "type": "conversion", "enzyme": {"name": "6-Phosphogluconate dehydrogenase", "ec": "1.1.1.44"}, "cofactorsIn": ["NADP⁺"], "cofactorsOut": ["NADPH", "CO₂"], "energy": {"nadph": 1, "co2": 1}, "description": "Oxidative decarboxylation."},
+    {"from": "ru5p", "to": "r5p", "type": "conversion", "enzyme": {"name": "Ribose-5-phosphate isomerase", "ec": "5.3.1.6"}, "reversible": true},
+    {"from": "r5p", "to": "nucleotides", "type": "conversion", "optional": true, "label": "via PRPP synthetase", "enzyme": {"name": "Ribose-phosphate diphosphokinase (PRPP synthetase)", "ec": "2.7.6.1"}},
+    {"from": "ru5p", "to": "x5p", "type": "conversion", "optional": true, "enzyme": {"name": "Ribulose-phosphate 3-epimerase", "ec": "5.1.3.1"}, "reversible": true},
+    {"from": "x5p", "to": "glyc", "type": "conversion", "optional": true, "enzyme": {"name": "Transketolase / transaldolase", "ec": "2.2.1.1 / 2.2.1.2", "regulation": "Transketolase requires thiamine pyrophosphate"}, "reversible": true, "description": "Carbon shuffling (non-oxidative phase) — reversible, so the pathway can make ribose without NADPH or NADPH without ribose."}
+  ]
+}

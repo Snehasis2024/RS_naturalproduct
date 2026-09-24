@@ -1,0 +1,37 @@
+{
+  "id": "amino-acid",
+  "name": "Amino acid metabolism: nitrogen handling",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "Amino-acid nitrogen is funnelled to glutamate by aminotransferases (PLP-dependent), released as NH₄⁺ by glutamate dehydrogenase, carried safely between tissues as glutamine or alanine, and disposed of as urea. The carbon skeletons (pyruvate, oxaloacetate, α-ketoglutarate) feed the TCA cycle or gluconeogenesis.",
+  "evidence": "established",
+  "layout": "manual",
+  "location": "Liver, muscle, kidney (cytosol and mitochondria)",
+  "net": "Amino acid + α-KG ⇌ α-keto acid + glutamate;  glutamate + NAD(P)⁺ + H₂O → α-KG + NH₄⁺ + NAD(P)H",
+  "clinical": "ALT and AST are clinical markers of liver damage. Phenylketonuria (phenylalanine hydroxylase deficiency) is detected by newborn screening. The glucose–alanine cycle moves nitrogen from muscle to liver.",
+  "references": [
+    {"label": "KEGG hsa01230 (Biosynthesis of amino acids)", "url": "https://www.kegg.jp/pathway/hsa01230"},
+    {"label": "KEGG hsa00250 (Alanine, aspartate and glutamate metabolism)", "url": "https://www.kegg.jp/pathway/hsa00250"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 23 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
+  ],
+  "nodes": [
+    {"id": "alanine", "label": "Alanine", "type": "metabolite", "mol": "alanine", "pos": [-6, 3, 0]},
+    {"id": "pyruvate", "label": "Pyruvate", "type": "metabolite", "mol": "pyruvate", "pos": [-6, -1, 0], "link": "gluconeogenesis"},
+    {"id": "akg", "label": "α-Ketoglutarate", "type": "metabolite", "mol": "akg", "pos": [-2, 1, 0]},
+    {"id": "glutamate", "label": "Glutamate", "type": "metabolite", "mol": "glutamate", "pos": [2, 1, 0]},
+    {"id": "aspartate", "label": "Aspartate", "type": "metabolite", "pos": [-2, 4.5, 0]},
+    {"id": "oaa", "label": "Oxaloacetate", "type": "metabolite", "mol": "oxaloacetate", "pos": [-2, -3, 0], "link": "tca"},
+    {"id": "nh4", "label": "NH₄⁺", "type": "metabolite", "pos": [5.5, -1, 0]},
+    {"id": "glutamine", "label": "Glutamine (N carrier)", "type": "metabolite", "pos": [5.5, 3.5, 0]},
+    {"id": "urea", "label": "Urea cycle", "type": "pathway", "mol": "urea", "pos": [6.5, -4, 0], "link": "urea-cycle"}
+  ],
+  "edges": [
+    {"from": "alanine", "to": "pyruvate", "type": "conversion", "enzyme": {"name": "Alanine aminotransferase (ALT)", "ec": "2.6.1.2", "regulation": "PLP-dependent"}, "cofactorsIn": ["α-KG"], "cofactorsOut": ["Glutamate"], "reversible": true},
+    {"from": "akg", "to": "glutamate", "type": "conversion", "enzyme": {"name": "Aminotransferases (ALT/AST)", "ec": "2.6.1.x", "regulation": "PLP (vitamin B6) cofactor"}, "reversible": true, "description": "α-KG collects the amino group."},
+    {"from": "aspartate", "to": "oaa", "type": "conversion", "enzyme": {"name": "Aspartate aminotransferase (AST)", "ec": "2.6.1.1"}, "cofactorsIn": ["α-KG"], "cofactorsOut": ["Glutamate"], "reversible": true},
+    {"from": "glutamate", "to": "nh4", "type": "conversion", "enzyme": {"name": "Glutamate dehydrogenase", "ec": "1.4.1.3", "regulation": "Activated by ADP/GDP, inhibited by GTP/ATP"}, "cofactorsIn": ["NAD(P)⁺", "H₂O"], "cofactorsOut": ["NAD(P)H", "α-KG"], "energy": {"nadh": 1}, "description": "Oxidative deamination (mitochondrial)."},
+    {"from": "glutamate", "to": "glutamine", "type": "conversion", "optional": true, "enzyme": {"name": "Glutamine synthetase", "ec": "6.3.1.2"}, "cofactorsIn": ["NH₄⁺", "ATP"], "cofactorsOut": ["ADP", "Pᵢ"], "description": "Non-toxic transport form of ammonia in blood."},
+    {"from": "glutamine", "to": "nh4", "type": "conversion", "optional": true, "enzyme": {"name": "Glutaminase", "ec": "3.5.1.2"}, "cofactorsIn": ["H₂O"], "cofactorsOut": ["Glutamate"], "description": "Releases NH₄⁺ in liver (for urea) and kidney (for acid excretion)."},
+    {"from": "nh4", "to": "urea", "type": "conversion", "enzyme": {"name": "Carbamoyl phosphate synthetase I", "ec": "6.3.4.16", "ref": "cps1"}}
+  ]
+}

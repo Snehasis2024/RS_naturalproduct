@@ -1,0 +1,274 @@
+{
+  "id": "oxphos",
+  "name": "Oxidative phosphorylation",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "Electrons from NADH and FADH₂ flow through the respiratory chain to O₂. Complexes I, III and IV pump protons into the intermembrane space; ATP synthase lets them flow back and uses that energy to make ATP (chemiosmotic coupling).",
+  "evidence": "established",
+  "layout": "manual",
+  "location": "Inner mitochondrial membrane",
+  "net": "NADH + H⁺ + ½ O₂ + ~2.5 ADP + ~2.5 Pᵢ → NAD⁺ + H₂O + ~2.5 ATP (≈1.5 ATP per FADH₂)",
+  "clinical": "Cyanide and carbon monoxide inhibit complex IV; rotenone inhibits complex I; oligomycin inhibits ATP synthase; uncouplers (2,4-dinitrophenol, thermogenin/UCP1 in brown fat) dissipate the gradient as heat.",
+  "references": [
+    {
+      "label": "KEGG hsa00190 (Oxidative phosphorylation)",
+      "url": "https://www.kegg.jp/pathway/hsa00190"
+    },
+    {
+      "label": "Berg et al., Biochemistry 5th ed., ch. 18 (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "nadh",
+      "label": "NADH",
+      "type": "metabolite",
+      "pos": [
+        -9,
+        -2.5,
+        0
+      ]
+    },
+    {
+      "id": "c1",
+      "label": "Complex I (NADH dehydrogenase)",
+      "type": "complex",
+      "description": "Pumps 4 H⁺ per 2 e⁻. Inhibited by rotenone.",
+      "pos": [
+        -7,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "fadh2",
+      "label": "Succinate → FADH₂",
+      "type": "metabolite",
+      "mol": "succinate",
+      "pos": [
+        -6,
+        -4,
+        0.5
+      ]
+    },
+    {
+      "id": "c2",
+      "label": "Complex II (succinate dehydrogenase)",
+      "type": "complex",
+      "description": "Pumps no protons.",
+      "pos": [
+        -4.5,
+        -2,
+        0
+      ]
+    },
+    {
+      "id": "q",
+      "label": "Ubiquinone (CoQ) pool",
+      "type": "metabolite",
+      "pos": [
+        -3,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "id": "c3",
+      "label": "Complex III (cytochrome bc₁)",
+      "type": "complex",
+      "description": "Q cycle: net 4 H⁺ released to the IMS per 2 e⁻.",
+      "pos": [
+        -0.5,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "cytc",
+      "label": "Cytochrome c",
+      "type": "protein",
+      "ref": "cytc",
+      "pos": [
+        1.5,
+        2,
+        0.5
+      ]
+    },
+    {
+      "id": "c4",
+      "label": "Complex IV (cytochrome c oxidase)",
+      "type": "complex",
+      "description": "Pumps 2 H⁺ per 2 e⁻ and reduces O₂ to H₂O. Inhibited by cyanide, CO, azide.",
+      "pos": [
+        3.5,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "o2",
+      "label": "O₂ → H₂O",
+      "type": "metabolite",
+      "pos": [
+        4.5,
+        -3,
+        0
+      ]
+    },
+    {
+      "id": "gradient",
+      "label": "Proton-motive force (Δp)",
+      "type": "process",
+      "description": "~180–200 mV across the inner membrane, mostly as membrane potential.",
+      "pos": [
+        0,
+        4.5,
+        0
+      ]
+    },
+    {
+      "id": "atpsynth",
+      "label": "ATP synthase (complex V)",
+      "type": "complex",
+      "ref": "atpSynthase",
+      "pos": [
+        7,
+        0.5,
+        0
+      ]
+    },
+    {
+      "id": "atp",
+      "label": "ATP",
+      "type": "metabolite",
+      "mol": "atp",
+      "pos": [
+        8.5,
+        -2.5,
+        0
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "nadh",
+      "to": "c1",
+      "type": "conversion",
+      "label": "2 e⁻",
+      "energy": {
+        "hplus": 4
+      },
+      "enzyme": {
+        "name": "NADH:ubiquinone oxidoreductase",
+        "ec": "7.1.1.2"
+      }
+    },
+    {
+      "from": "fadh2",
+      "to": "c2",
+      "type": "conversion",
+      "label": "2 e⁻",
+      "optional": true,
+      "enzyme": {
+        "name": "Succinate dehydrogenase",
+        "ec": "1.3.5.1"
+      }
+    },
+    {
+      "from": "c1",
+      "to": "q",
+      "type": "conversion",
+      "label": "QH₂"
+    },
+    {
+      "from": "c2",
+      "to": "q",
+      "type": "conversion",
+      "label": "QH₂",
+      "optional": true
+    },
+    {
+      "from": "q",
+      "to": "c3",
+      "type": "conversion",
+      "label": "2 e⁻",
+      "energy": {
+        "hplus": 4
+      },
+      "enzyme": {
+        "name": "Ubiquinol:cytochrome c oxidoreductase",
+        "ec": "7.1.1.8"
+      }
+    },
+    {
+      "from": "c3",
+      "to": "cytc",
+      "type": "conversion",
+      "label": "1 e⁻ each"
+    },
+    {
+      "from": "cytc",
+      "to": "c4",
+      "type": "conversion",
+      "energy": {
+        "hplus": 2
+      },
+      "enzyme": {
+        "name": "Cytochrome c oxidase",
+        "ec": "7.1.1.9"
+      }
+    },
+    {
+      "from": "c4",
+      "to": "o2",
+      "type": "conversion",
+      "label": "½ O₂ + 2 H⁺ → H₂O",
+      "energy": {
+        "h2o": 1
+      }
+    },
+    {
+      "from": "c1",
+      "to": "gradient",
+      "type": "activation",
+      "label": "H⁺ pumped",
+      "optional": true
+    },
+    {
+      "from": "c3",
+      "to": "gradient",
+      "type": "activation",
+      "label": "H⁺ pumped",
+      "optional": true
+    },
+    {
+      "from": "c4",
+      "to": "gradient",
+      "type": "activation",
+      "label": "H⁺ pumped",
+      "optional": true
+    },
+    {
+      "from": "gradient",
+      "to": "atpsynth",
+      "type": "activation",
+      "label": "H⁺ flow drives rotation",
+      "enzyme": {
+        "name": "F₀F₁-ATP synthase",
+        "ec": "7.1.2.2",
+        "ref": "atpSynthase"
+      }
+    },
+    {
+      "from": "atpsynth",
+      "to": "atp",
+      "type": "conversion",
+      "label": "ADP + Pᵢ → ATP",
+      "energy": {
+        "atp": 2.5
+      },
+      "description": "≈10 H⁺ pumped per NADH; ≈4 H⁺ per ATP (including phosphate/ADP–ATP transport) ⇒ ≈2.5 ATP per NADH."
+    }
+  ]
+}

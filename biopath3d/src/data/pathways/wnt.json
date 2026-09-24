@@ -1,0 +1,38 @@
+{
+  "id": "wnt",
+  "name": "WNT–β-catenin",
+  "category": "signaling",
+  "topic": "signaling",
+  "summary": "Without WNT, a destruction complex continuously phosphorylates β-catenin for degradation. WNT binding to Frizzled/LRP6 inhibits the complex, so β-catenin accumulates, enters the nucleus and activates TCF/LEF target genes.",
+  "evidence": "established",
+  "layout": "layered",
+  "clinical": "APC loss initiates most colorectal cancers; CTNNB1 stabilising mutations occur in liver and endometrial cancers.",
+  "outcomes": ["Stem-cell renewal", "Proliferation", "Developmental patterning"],
+  "references": [
+    {"label": "KEGG hsa04310 (Wnt signaling)", "url": "https://www.kegg.jp/pathway/hsa04310"},
+    {"label": "Nusse & Clevers (2017) Cell 169:985 — Wnt/β-catenin signaling", "url": "https://doi.org/10.1016/j.cell.2017.05.016"}
+  ],
+  "nodes": [
+    {"id": "wnt", "label": "WNT", "type": "ligand", "ref": "wnt", "compartment": "extracellular"},
+    {"id": "fzd", "label": "Frizzled / LRP6", "type": "receptor", "ref": "frizzled", "compartment": "membrane"},
+    {"id": "dvl", "label": "Dishevelled", "type": "adaptor", "ref": "dvl", "compartment": "cytoplasm"},
+    {"id": "dc", "label": "Destruction complex (APC/AXIN/GSK3β/CK1)", "type": "complex", "ref": "destructionComplex", "compartment": "cytoplasm"},
+    {"id": "bcat", "label": "β-catenin", "type": "protein", "ref": "betaCatenin", "compartment": "cytoplasm"},
+    {"id": "proteasome", "label": "Proteasomal degradation", "type": "process", "ref": "ubiquitin", "compartment": "cytoplasm"},
+    {"id": "bcatn", "label": "β-catenin (nuclear)", "type": "protein", "ref": "betaCatenin", "compartment": "nucleus"},
+    {"id": "tcf", "label": "TCF/LEF", "type": "transcription-factor", "ref": "tcf", "compartment": "nucleus"},
+    {"id": "targets", "label": "MYC, Cyclin D1, AXIN2", "type": "gene", "ref": "myc", "compartment": "nucleus"},
+    {"id": "out", "label": "Proliferation / stemness", "type": "outcome", "compartment": "outcome"}
+  ],
+  "edges": [
+    {"from": "wnt", "to": "fzd", "type": "binding"},
+    {"from": "fzd", "to": "dvl", "type": "activation"},
+    {"from": "dvl", "to": "dc", "type": "inhibition", "label": "sequesters AXIN, inhibits GSK3β"},
+    {"from": "dc", "to": "bcat", "type": "phosphorylation", "label": "marks for degradation (no WNT)"},
+    {"from": "bcat", "to": "proteasome", "type": "degradation", "label": "β-TrCP ubiquitination"},
+    {"from": "bcat", "to": "bcatn", "type": "translocation", "label": "stabilised β-catenin"},
+    {"from": "bcatn", "to": "tcf", "type": "binding"},
+    {"from": "tcf", "to": "targets", "type": "transcription"},
+    {"from": "targets", "to": "out", "type": "activation"}
+  ]
+}

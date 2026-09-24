@@ -1,0 +1,41 @@
+{
+  "id": "gluconeogenesis",
+  "name": "Gluconeogenesis",
+  "category": "metabolic",
+  "topic": "metabolism",
+  "summary": "Liver (and kidney) synthesise glucose from pyruvate, lactate, glycerol and glucogenic amino acids. It reverses glycolysis but bypasses its three irreversible steps with four different enzymes.",
+  "evidence": "established",
+  "layout": "chain",
+  "location": "Mitochondria (pyruvate carboxylase) → cytosol → ER lumen (glucose-6-phosphatase)",
+  "net": "2 Pyruvate + 4 ATP + 2 GTP + 2 NADH + 6 H₂O → Glucose + 4 ADP + 2 GDP + 6 Pᵢ + 2 NAD⁺",
+  "clinical": "Von Gierke disease (glucose-6-phosphatase deficiency, GSD Ia) causes fasting hypoglycaemia and lactic acidosis. Metformin lowers hepatic glucose output. Alcohol inhibits gluconeogenesis by raising NADH/NAD⁺.",
+  "references": [
+    {"label": "KEGG hsa00010 (Glycolysis / Gluconeogenesis)", "url": "https://www.kegg.jp/pathway/hsa00010"},
+    {"label": "Berg et al., Biochemistry 5th ed., ch. 16.3 (NCBI Bookshelf)", "url": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
+  ],
+  "nodes": [
+    {"id": "pyruvate", "label": "Pyruvate (×2)", "type": "metabolite", "mol": "pyruvate"},
+    {"id": "oaa", "label": "Oxaloacetate", "type": "metabolite", "mol": "oxaloacetate"},
+    {"id": "pep", "label": "Phosphoenolpyruvate", "type": "metabolite", "mol": "pep"},
+    {"id": "pg2", "label": "2-Phosphoglycerate", "type": "metabolite", "mol": "pg2"},
+    {"id": "pg3", "label": "3-Phosphoglycerate", "type": "metabolite", "mol": "pg3"},
+    {"id": "bpg13", "label": "1,3-Bisphosphoglycerate", "type": "metabolite", "mol": "bpg13"},
+    {"id": "g3p", "label": "G3P (+ DHAP)", "type": "metabolite", "mol": "g3p"},
+    {"id": "f16bp", "label": "Fructose-1,6-bisphosphate", "type": "metabolite", "mol": "f16bp"},
+    {"id": "f6p", "label": "Fructose-6-phosphate", "type": "metabolite", "mol": "f6p"},
+    {"id": "g6p", "label": "Glucose-6-phosphate", "type": "metabolite", "mol": "g6p"},
+    {"id": "glucose", "label": "Glucose", "type": "metabolite", "mol": "glucose"}
+  ],
+  "edges": [
+    {"from": "pyruvate", "to": "oaa", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Pyruvate carboxylase", "ec": "6.4.1.1", "regulation": "Allosterically activated by acetyl-CoA; biotin-dependent"}, "cofactorsIn": ["ATP", "HCO₃⁻"], "cofactorsOut": ["ADP"], "energy": {"atp": -1}, "description": "Bypass 1a (mitochondrial)."},
+    {"from": "oaa", "to": "pep", "type": "conversion", "multiplier": 2, "enzyme": {"name": "PEP carboxykinase (PEPCK)", "ec": "4.1.1.32", "regulation": "Transcriptionally induced by glucagon/cortisol"}, "cofactorsIn": ["GTP"], "cofactorsOut": ["GDP", "CO₂"], "energy": {"gtp": -1}, "description": "Bypass 1b."},
+    {"from": "pep", "to": "pg2", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Enolase", "ec": "4.2.1.11"}, "reversible": true},
+    {"from": "pg2", "to": "pg3", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Phosphoglycerate mutase", "ec": "5.4.2.11"}, "reversible": true},
+    {"from": "pg3", "to": "bpg13", "type": "conversion", "multiplier": 2, "enzyme": {"name": "Phosphoglycerate kinase", "ec": "2.7.2.3"}, "cofactorsIn": ["ATP"], "cofactorsOut": ["ADP"], "energy": {"atp": -1}, "reversible": true},
+    {"from": "bpg13", "to": "g3p", "type": "conversion", "multiplier": 2, "enzyme": {"name": "GAPDH", "ec": "1.2.1.12", "ref": "gapdh"}, "cofactorsIn": ["NADH"], "cofactorsOut": ["NAD⁺", "Pᵢ"], "energy": {"nadh": -1}, "reversible": true},
+    {"from": "g3p", "to": "f16bp", "type": "conversion", "enzyme": {"name": "Aldolase (+ TPI)", "ec": "4.1.2.13"}, "reversible": true, "description": "Two trioses (G3P + DHAP) condense into one hexose."},
+    {"from": "f16bp", "to": "f6p", "type": "conversion", "enzyme": {"name": "Fructose-1,6-bisphosphatase", "ec": "3.1.3.11", "regulation": "Inhibited by AMP and fructose-2,6-bisphosphate (reciprocal to PFK-1)"}, "cofactorsIn": ["H₂O"], "cofactorsOut": ["Pᵢ"], "description": "Bypass 2."},
+    {"from": "f6p", "to": "g6p", "type": "conversion", "enzyme": {"name": "Phosphoglucose isomerase", "ec": "5.3.1.9"}, "reversible": true},
+    {"from": "g6p", "to": "glucose", "type": "conversion", "enzyme": {"name": "Glucose-6-phosphatase", "ec": "3.1.3.9", "regulation": "ER lumen; liver and kidney only (absent in muscle)"}, "cofactorsIn": ["H₂O"], "cofactorsOut": ["Pᵢ"], "description": "Bypass 3."}
+  ]
+}
